@@ -1,0 +1,133 @@
+{
+    "name": "web3-crack",
+    "version": "1.1.0",
+    "author": "devilyouwei",
+    "license": "MIT",
+    "description": "A tool for web3, blockchain, smart contract, API interaction, data crawler, and data analysis by machine learning.",
+    "main": "index.js",
+    "scripts": {
+        "format": "prettier 'src/*.js' --write",
+        "clean": "rm -rf ./tf/logs/**/train ./tf/mymodels/**/*",
+        "DB": "node ./src/initDB.js",
+        "contract": "node ./src/getContract.js",
+        "token": "node ./src/getToken.js",
+        "code": "node ./src/getCode.js",
+        "data": "node ./src/getData.js",
+        "updateContract": "node ./src/updateContract.js",
+        "updateToken": "node ./src/updateToken.js",
+        "updateCode": "node ./src/updateCode.js",
+        "scamsniper": "node ./src/scamsniper.js",
+        "safu": "node ./src/safu.js",
+        "tokenizer": "node ./tensorflow/tokenizer.js",
+        "dev": "pm2-dev start ./web/app.js",
+        "restart": "pm2 restart ./web/app.js",
+        "start": "pm2 start ./web/app.js",
+        "stop": "pm2 stop ./web/app.js",
+        "status": "pm2 status",
+        "delete": "pm2 delete app",
+        "pm2-update": "pm2 update",
+        "highlight": "node ./tensorflow/modules/highlight.js",
+        "dense": "node ./tensorflow/dense.js",
+        "smartbert-dense": "node ./tensorflow/smartbert-dense.js",
+        "cnn": "node ./tensorflow/cnn.js",
+        "smartbert-cnn": "node ./tensorflow/smartbert-cnn.js",
+        "lstm": "node ./tensorflow/lstm.js",
+        "bilstm": "node ./tensorflow/bilstm.js",
+        "smartbert-lstm": "node ./tensorflow/smartbert-lstm.js",
+        "smartbert-high-lstm": "node ./tensorflow/smartbert-high-lstm.js",
+        "smartbert-high-bilstm": "node ./tensorflow/smartbert-high-bilstm.js",
+        "smartbert-bilstm": "node ./tensorflow/smartbert-bilstm.js",
+        "smartbert-dense-lstm": "node ./tensorflow/smartbert-dense-lstm.js",
+        "smartbert-dense-bilstm": "node ./tensorflow/smartbert-dense-bilstm.js",
+        "smartbert-concat-lstm": "node ./tensorflow/smartbert-concat-lstm.js",
+        "smartbert-concat-bilstm": "node ./tensorflow/smartbert-concat-bilstm.js",
+        "mysql": "docker-compose -f ./docker/docker-compose.yml up -d",
+        "ncu": "ncu -u"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/MUST-ISDA/web3-crack.git"
+    },
+    "keywords": [
+        "web3",
+        "blockchain",
+        "smart contract",
+        "crawler"
+    ],
+    "bugs": {
+        "url": "https://github.com/MUST-ISDA/web3-crack/issues"
+    },
+    "homepage": "https://github.com/MUST-ISDA/web3-crack#readme",
+    "devDependencies": {
+        "@types/serve-index": "^1.9.1",
+        "eslint": "^8.33.0",
+        "eslint-config-prettier": "^8.6.0",
+        "eslint-plugin-prettier": "^4.2.1",
+        "npm-check-updates": "^16.6.3",
+        "prettier": "^2.8.3"
+    },
+    "dependencies": {
+        "@tensorflow/tfjs-node": "^4.10.0",
+        "@tensorflow/tfjs-node-gpu": "^4.10.0",
+        "app-root-path": "^3.1.0",
+        "bert-tokenizer": "^1.1.8",
+        "body-parser": "^1.20.1",
+        "cheerio": "^1.0.0-rc.12",
+        "cross-fetch": "^3.1.5",
+        "dotenv": "^16.0.3",
+        "express": "^4.18.2",
+        "form-data": "^4.0.0",
+        "lodash": "^4.17.21",
+        "md5": "^2.3.0",
+        "multer": "^1.4.5-lts.1",
+        "mysql2": "^3.1.0",
+        "node-xlsx": "^0.21.0",
+        "pm2": "^5.2.2",
+        "puppeteer": "^19.6.3",
+        "puppeteer-extra": "^3.3.4",
+        "puppeteer-extra-plugin-adblocker": "^2.13.5",
+        "puppeteer-extra-plugin-stealth": "^2.11.1",
+        "request": "^2.88.2",
+        "sentencepiece-js": "^1.1.0",
+        "sequelize": "^6.28.0",
+        "serve-index": "^1.9.1",
+        "solc": "^0.8.18",
+        "superagent": "^8.0.9",
+        "tf-kmeans-node": "^1.1.1",
+        "treebank-tokenizer": "^0.0.1",
+        "treeify": "^1.1.0",
+        "web3": "^1.8.2"
+    },
+    "eslintConfig": {
+        "root": true,
+        "parserOptions": {
+            "ecmaVersion": "latest"
+        },
+        "env": {
+            "es6": true,
+            "node": true
+        },
+        "extends": [
+            "eslint:recommended",
+            "plugin:prettier/recommended"
+        ],
+        "rules": {
+            "no-var": "error",
+            "no-unused-vars": "warn",
+            "prefer-const": "error",
+            "no-invalid-regexp": "off",
+            "no-div-regex": "off",
+            "no-control-regex": "off",
+            "prettier/prettier": "error"
+        }
+    },
+    "prettier": {
+        "trailingComma": "none",
+        "printWidth": 120,
+        "tabWidth": 4,
+        "semi": false,
+        "bracketSpacing": true,
+        "arrowParens": "avoid",
+        "singleQuote": true
+    }
+}

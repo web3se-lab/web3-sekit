@@ -1,0 +1,27 @@
+{
+    "bscMain": {
+        "api": "https://api.bscscan.com/api",
+        "token": "https://bscscan.com/token",
+        "tokens": "https://bscscan.com/tokens",
+        "address": "https://bscscan.com/address",
+        "apikey": "3S4TWIK33NXN1F5A47XWJH2RVIIZRCGIUD",
+        "honeypot": "https://aywt3wreda.execute-api.eu-west-1.amazonaws.com/default/IsHoneypot?chain=bsc2&token=",
+        "holders": "https://api.staysafu.org/api/holders",
+        "analysecode": "https://api.staysafu.org/api/analysecode",
+        "ownership": "https://api.staysafu.org/api/ownership",
+        "simulatebuy": "https://api.staysafu.org/api/simulatebuy",
+        "liqlocked": "https://api.staysafu.org/api/liqlocked",
+        "web3": "https://bsc-dataseed1.ninicoin.io",
+        "contract": "https://bscscan.com/contractsVerified"
+    },
+    "ethMain": {
+        "api": "https://api.etherscan.io/api",
+        "tokens": "https://etherscan.io/tokens",
+        "address": "https://etherscan.io/address",
+        "token": "https://etherscan.io/token",
+        "apikey": "UHSCHK17WVPI9ADST7RCEBTHBRZJ415B3U",
+        "honeypot": "https://aywt3wreda.execute-api.eu-west-1.amazonaws.com/default/IsHoneypot?chain=eth&token=",
+        "web3": "https://rpc.flashbots.net/",
+        "contract": "https://etherscan.io/contractsVerified"
+    }
+}
