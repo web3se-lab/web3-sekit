@@ -1,21 +1,58 @@
 const ROOT = require('app-root-path')
 const $data = require('../src/getData')
+const { findOneByPk, findOneByAddress, count, maxId } = require('../src/getContract')
+const { embed } = require('../tf/modules/embedding')
 const $ = require('../src/utils')
 
 const EVA_PATH = `${ROOT}/tf/evaluates`
 
-async function sourceCodeRisk(req, res, next) {
+// get code content from DB
+async function get(req, res, next) {
     try {
-        const key = req.query.key // key is for token table
-        const data = await $data.getSourceCodeScam(key)
-        if (!data) return res.sendStatus(404)
-        return res.json({ ...data })
+        const key = req.body.key
+        let data
+        const attrs = ['Id', 'ContractName', 'ContractAddress', 'Network', 'SourceCode', 'CompilerVersion', 'ABI']
+        if (!key) data = { maxId: await maxId(), count: await count() }
+        else if (key.substr(0, 2) === '0x') data = await findOneByAddress(key, attrs)
+        else data = await findOneByPk(key, attrs)
+        if (!data) throw new Error(`${key} not found`)
+        const type = data.CompilerVersion.includes('vyper') ? 'vyper' : 'solidity'
+        res.json({
+            Type: type,
+            CodeTree: $.getCodeMap($.clearCode($.multiContracts(data.SourceCode), type), type),
+            ...data.dataValues
+        })
     } catch (e) {
         next(e)
     }
 }
 
-// return evaluation data
+// smart contract to embedding
+async function embedding(req, res, next) {
+    try {
+        const text = req.body.text
+        const type = req.body.type || 'solidity'
+        res.json({
+            Embedding: await embed($.getCodeMap($.clearCode($.multiContracts(text), type), type))
+        })
+    } catch (e) {
+        next(e)
+    }
+}
+
+// get code with risk array
+async function codeRisk(req, res, next) {
+    try {
+        const key = req.body.key // key is for token table
+        const data = await $data.getSourceCodeScam(key)
+        if (!data) throw new Error(`${key} not found`)
+        return res.json(data)
+    } catch (e) {
+        next(e)
+    }
+}
+
+// get evaluation result data
 async function evaluate(_, res, next) {
     try {
         const data = [
@@ -58,4 +95,4 @@ async function evaluate(_, res, next) {
     }
 }
 
-module.exports = { sourceCodeRisk, evaluate }
+module.exports = { get, embedding, codeRisk, evaluate }

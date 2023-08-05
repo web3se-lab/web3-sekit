@@ -24,7 +24,7 @@ app.use(multer().array())
 app.get('/', (_, res) => {
     res.send(`
         <h1>SmartIntentNN API</h1>
-        <a href="https://gitlab.com/web3se/smartintent">For the documentation, visit our GitLab</a>`)
+        <a href="https://github.com/devilyouwei/SmartIntent">See Documentation</a>`)
 })
 
 const statics = ['evaluates', 'models']
@@ -38,6 +38,7 @@ app.all('*', (req, res, next) => {
         const path = req.path.toString()
         const ctl = path.split('/')[1]
         if (statics.includes(ctl)) return next()
+        if (req.method == 'GET') req.body = req.query // get强制转post参数
 
         // MVC
         const act = path.split('/')[2]
@@ -45,7 +46,7 @@ app.all('*', (req, res, next) => {
         fun[act](req, res, next)
     } catch (e) {
         console.error(e)
-        next(e.message)
+        next(e)
     }
 })
 

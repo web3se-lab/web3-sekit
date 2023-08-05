@@ -1,15 +1,18 @@
-const { Token } = require('./DB')
+const { Token } = require('../db/DB')
 const T = Token
+
 async function count() {
     const res = await T.count()
     if (process.argv[2] == 'count') console.log(res)
     return res
 }
+
 async function maxId() {
     const res = await T.max('id')
     if (process.argv[2] == 'max') console.log(res)
     return res
 }
+
 async function findOneByAddress(address, attributes) {
     const options = { where: { ContractAddress: address } }
     if (attributes) options.attributes = attributes
@@ -17,6 +20,7 @@ async function findOneByAddress(address, attributes) {
     if (process.argv[2] == 'get') console.log(res.dataValues)
     return res
 }
+
 async function findOneByPk(id, attributes) {
     const options = {}
     if (attributes) options.attributes = attributes

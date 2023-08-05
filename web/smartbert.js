@@ -12,7 +12,7 @@ async function embed(req, res, next) {
             data[i] = {}
             for (const j in tree[i]) data[i][j] = await embedAPI(tree[i][j], func)
         }
-        res.json({ status: 1, data, msg: `smartbert: ${func} successfully` })
+        res.json(data)
     } catch (e) {
         next(e)
     }
@@ -28,17 +28,19 @@ async function tokenize(req, res, next) {
             data[i] = {}
             for (const j in tree[i]) data[i][j] = await tokenizeAPI(tree[i][j])
         }
-        res.json({ status: 1, data, msg: `smartbert: tokenize successfully` })
+        res.json(data)
     } catch (e) {
         next(e)
     }
 }
+
+// generate tree
 async function tree(req, res, next) {
     try {
         const code = req.body.code
         const type = req.body.type || 'solidity'
         const data = $.getCodeMap($.clearCode(code), type)
-        res.json({ status: 1, data, msg: `smartbert: code tree successfully` })
+        res.json(data)
     } catch (e) {
         next(e)
     }

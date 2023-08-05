@@ -54,17 +54,17 @@ async function getSourceCodeScam(key) {
     const sourceCode = res.contract.SourceCode
     const type = res.contract.CompilerVersion.includes('vyper') ? 'vyper' : 'solidity'
     const network = res.contract.Network
-    const sourceCodeMap = $.getCodeMap($.clearCode($.multiContracts(sourceCode), type), type)
+    const codeTree = $.getCodeMap($.clearCode($.multiContracts(sourceCode), type), type)
     const address = res.ContractAddress
 
     if (process.argv[2] === 'code-scam') {
-        codeMap(sourceCodeMap)
+        codeMap(codeTree)
         console.log('Id', res.Id)
         console.log('Address', address)
         console.log('Scams', risk)
     }
 
-    return { address, type, network, risk, sourceCodeMap, sourceCode }
+    return { address, type, network, risk, codeTree, sourceCode }
 }
 
 async function getSourceCodeTokenType(key) {
