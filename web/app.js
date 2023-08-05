@@ -1,3 +1,4 @@
+require('dotenv').config()
 const ROOT = require('app-root-path')
 const express = require('express')
 const serveIndex = require('serve-index')
@@ -50,5 +51,5 @@ app.all('*', (req, res, next) => {
     }
 })
 
-app.listen(8080)
+app.listen(process.env.WEB_PORT)
 console.log('Server Started')
