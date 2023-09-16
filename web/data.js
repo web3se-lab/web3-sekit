@@ -1,8 +1,8 @@
 const ROOT = require('app-root-path')
 const $data = require('../db/data')
 const $vul = require('../db/vulnerability')
+const $contract = require('../db/contract')
 const type = require('./type')
-const { findOneByPk, findOneByAddress, count, maxId } = require('../db/contract')
 const { embed } = require('../tf/modules/embedding')
 const $ = require('../src/utils')
 
@@ -14,9 +14,9 @@ async function get(req, res, next) {
         const key = req.body.key
         let data
         const attrs = ['Id', 'ContractName', 'ContractAddress', 'Network', 'SourceCode', 'CompilerVersion', 'ABI']
-        if (!key) data = { maxId: await maxId(), count: await count() }
-        else if (key.substr(0, 2) === '0x') data = await findOneByAddress(key, attrs)
-        else data = await findOneByPk(key, attrs)
+        if (!key) data = { maxId: await $contract.maxId(), count: await $contract.count() }
+        else if (key.substr(0, 2) === '0x') data = await $contract.findOneByAddress(key, attrs)
+        else data = await $contract.findOneByPk(key, attrs)
         if (!data) throw new Error(`${key} not found`)
         const type = data.CompilerVersion.includes('vyper') ? 'vyper' : 'solidity'
         res.json({
