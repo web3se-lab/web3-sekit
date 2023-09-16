@@ -1,6 +1,8 @@
 const ROOT = require('app-root-path')
-const $data = require('../src/getData')
-const { findOneByPk, findOneByAddress, count, maxId } = require('../src/getContract')
+const $data = require('../db/data')
+const $vul = require('../db/vulnerability')
+const type = require('./type')
+const { findOneByPk, findOneByAddress, count, maxId } = require('../db/contract')
 const { embed } = require('../tf/modules/embedding')
 const $ = require('../src/utils')
 
@@ -41,12 +43,26 @@ async function embedding(req, res, next) {
 }
 
 // get code with risk array
-async function codeRisk(req, res, next) {
+async function intent(req, res, next) {
     try {
         const key = req.body.key // key is for token table
         const data = await $data.getSourceCodeScam(key)
         if (!data) throw new Error(`${key} not found`)
         return res.json(data)
+    } catch (e) {
+        next(e)
+    }
+}
+async function vulnerability(req, res, next) {
+    try {
+        const key = req.body.key // key is for token table
+        const data = await $vul.findOneByPk(key)
+        if (!data) throw new Error(`${key} not found`)
+        return res.json({
+            data: data.SourceCode,
+            label: type.vulnerability[data.Vulnerability],
+            vulnerability: data.Vulnerability
+        })
     } catch (e) {
         next(e)
     }
@@ -95,4 +111,4 @@ async function evaluate(_, res, next) {
     }
 }
 
-module.exports = { get, embedding, codeRisk, evaluate }
+module.exports = { get, embedding, evaluate, intent, vulnerability }

@@ -90,5 +90,24 @@ module.exports = {
                 }
             ]
         }
+    },
+    Vulnerability: {
+        name: 'vulnerability',
+        table: {
+            Id: { type: DataTypes.INTEGER(11), primaryKey: true, autoIncrement: true },
+            SourceCode: DataTypes.TEXT('medium'),
+            Vulnerability: DataTypes.STRING
+        },
+        options: {
+            charset: 'utf8mb4',
+            collate: 'utf8mb4_general_ci',
+            indexes: [
+                {
+                    name: 'vulnerability_type_index',
+                    method: 'BTREE',
+                    fields: ['Vulnerability']
+                }
+            ]
+        }
     }
 }

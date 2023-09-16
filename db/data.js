@@ -2,9 +2,9 @@ const ROOT = require('app-root-path')
 const fs = require('fs')
 const tree = require('treeify')
 const { Op } = require('sequelize')
-const { Contract, Token } = require('../db/DB')
-const { findOneByPk } = require('./getContract')
-const $ = require('./utils')
+const { Contract, Token } = require('./DB')
+const { findOneByPk } = require('./contract')
+const $ = require('../src/utils')
 
 async function TokenHasContract(key, tokenAttr, codeAttr) {
     const options = {
@@ -175,7 +175,7 @@ async function json2txt() {
     }
 }
 
-if (process.argv[1].includes('getData')) {
+if (process.argv[1].includes('db/data')) {
     if (process.argv[2] === 'code-risk') getSourceCodeRisk(process.argv[3])
     if (process.argv[2] === 'code-scam') getSourceCodeScam(process.argv[3])
     if (process.argv[2] === 'code-token-type') getSourceCodeTokenType(process.argv[3])

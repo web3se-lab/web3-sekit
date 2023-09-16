@@ -1,4 +1,4 @@
-const { Token } = require('../db/DB')
+const { Token } = require('./DB')
 const T = Token
 
 async function count() {
@@ -35,7 +35,7 @@ async function upsert(data) {
     return row
 }
 
-if (process.argv[1].includes('getToken')) {
+if (process.argv[1].includes('db/token')) {
     if (process.argv[2] == 'get') {
         if (process.argv[3].substring(0, 2) == '0x') findOneByAddress(process.argv[3])
         else findOneByPk(parseInt(process.argv[3]))

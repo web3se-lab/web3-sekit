@@ -1,6 +1,7 @@
-const { Contract } = require('../db/DB')
-const $ = require('./utils')
+const { Contract } = require('./DB')
+const $ = require('../src/utils')
 const T = Contract
+
 async function count() {
     return await T.count()
 }
@@ -20,14 +21,9 @@ async function findOneByPk(id, attributes) {
 
 // check if existed
 async function check(address) {
-    let flag = false
-    const res = await T.count({
-        where: {
-            ContractAddress: address
-        }
-    })
-    if (res > 0) flag = true
-    return flag
+    const res = await T.count({ where: { ContractAddress: address } })
+    if (res > 0) return true
+    else return false
 }
 
 async function insert(data) {
@@ -38,11 +34,7 @@ async function insert(data) {
 }
 
 async function removeNull() {
-    const row = await T.destroy({
-        where: {
-            SourceCode: ''
-        }
-    })
+    const row = await T.destroy({ where: { SourceCode: '' } })
     return row
 }
 
@@ -153,7 +145,7 @@ async function getTokenIdsByAddress(ContractAddress) {
     else return null
 }
 
-if (process.argv[1].includes('getContract')) {
+if (process.argv[1].includes('db/contract')) {
     if (process.argv[2] == 'count') count().then(r => console.log(r))
     if (process.argv[2] == 'max') maxId().then(r => console.log(r))
     if (process.argv[2] == 'get') {

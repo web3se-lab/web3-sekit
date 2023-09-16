@@ -5,7 +5,7 @@ const FILE = `${ROOT}/db/contracts5.csv`
 const $contract = require('./getContract')
 const $token = require('./getToken')
 const { sleep, get, getAPI } = require('./utils')
-const { embedAPI, tokenizeAPI, removeBr, tf } = require('../tensorflow/utils')
+const { embedAPI, tokenizeAPI, removeBr } = require('../tensorflow/utils')
 const NETWORK = 'ethMain'
 const config = require('../config/network.json')[NETWORK]
 
@@ -206,7 +206,7 @@ async function embedAllMax(start = 1, end) {
     }
 }
 
-if (process.argv[1].includes('updateContract')) {
+if (process.argv[1].includes('src/contract')) {
     // argv 2 is contract address
     if (process.argv[2].substring(0, 2) == '0x') getFromAddress(process.argv[2])
     else if (process.argv[2] == 'tokens') getFromTokens()

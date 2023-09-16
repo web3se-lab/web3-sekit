@@ -230,7 +230,7 @@ async function updateContractRisk() {
     }
 }
 
-if (process.argv[1].includes('updateToken')) {
+if (process.argv[1].includes('src/token')) {
     if (process.argv[2] === 'info') updateInfo(process.argv[3])
     if (process.argv[2] === 'honeypot') updateHoneypot(process.argv[3])
     if (process.argv[2] === 'removeNull') removeNull()
