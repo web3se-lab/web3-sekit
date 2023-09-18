@@ -82,9 +82,9 @@ const utils = {
             // remove comments
             code = code.replace(/\/\*[\s\S]*?\*\/|(?<!:)\/\/.*/gm, '')
             // remove import
-            code = code.replace(/import[^;]*;/gm, '')
+            code = code.replace(/^import[^;]*;/gm, '')
             // remove pragma
-            code = code.replace(/pragma[^;]*;/gm, '')
+            code = code.replace(/^pragma[^;]*;/gm, '')
             // code = this.decodeStr(code)
         } else if (type === 'vyper') {
             // remove comments
@@ -100,7 +100,7 @@ const utils = {
     getContracts(text) {
         text = this.encodeStr(text)
         const reg =
-            /(^|\s|)(contract|interface|library|abstract\s*contract)[^;{}]*{(?:[^{}]+|{(?:[^{}]+|{(?:[^{}]+|{(?:[^{}]+|{(?:[^{}]+|{(?:[^{}]+|{(?:[^{}]+|{(?:[^{}]+|{(?:[^{}]+|{[^{}]*})*})*})*})*})*})*})*})*})*}/gm
+            /(^|\s|)(contract|interface|library|abstract\s*contract)[^;{}]*{(?:[^{}]+|{(?:[^{}]+|{(?:[^{}]+|{(?:[^{}]+|{(?:[^{}]+|{(?:[^{}]+|{(?:[^{}]+|{(?:[^{}]+|{(?:[^{}]+|{[^{}]*})*})*})*})*})*})*})*})*})*}/g
         const res = text.match(reg) || []
         for (const i in res) res[i] = this.decodeStr(res[i].trim())
         return res
@@ -109,7 +109,7 @@ const utils = {
     getFunctions(text) {
         text = this.encodeStr(text)
         const reg =
-            /(^|\s|)(function|event|modifier|constructor)[^{};]*({(?:[^}{]+|{(?:[^}{]+|{(?:[^}{]+|{(?:[^}{]+|{(?:[^}{]+|{(?:[^}{]+|{(?:[^}{]+|{(?:[^}{]+|{[^}{]*})*})*})*})*})*})*})*})*}|;)/gm
+            /(^|\s|)(function|event|modifier|constructor)[^{};]*({(?:[^}{]+|{(?:[^}{]+|{(?:[^}{]+|{(?:[^}{]+|{(?:[^}{]+|{(?:[^}{]+|{(?:[^}{]+|{(?:[^}{]+|{[^}{]*})*})*})*})*})*})*})*})*}|;)/g
         const res = text.match(reg) || []
         for (const i in res) res[i] = this.decodeStr(res[i].trim())
         return res
