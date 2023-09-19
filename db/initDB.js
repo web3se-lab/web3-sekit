@@ -68,4 +68,4 @@ if (process.argv[1].includes('DB')) {
     if (process.argv[2] == 'drop') drop(process.argv[3])
 }
 
-module.exports = { model, connect }
+module.exports = { model, connect, pool }
