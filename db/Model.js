@@ -98,7 +98,8 @@ module.exports = {
             SourceCode: DataTypes.TEXT('medium'),
             Vulnerability: DataTypes.STRING,
             Embedding: DataTypes.TEXT('long'),
-            EmbeddingMax: DataTypes.TEXT('long')
+            EmbeddingMax: DataTypes.TEXT('long'),
+            File: DataTypes.STRING
         },
         options: {
             charset: 'utf8mb4',
