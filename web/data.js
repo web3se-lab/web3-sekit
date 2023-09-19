@@ -61,7 +61,8 @@ async function vulnerability(req, res, next) {
         return res.json({
             data: data.SourceCode,
             label: type.vulnerability[data.Vulnerability],
-            vulnerability: data.Vulnerability
+            vulnerability: data.Vulnerability,
+            embedding: JSON.parse(data.Embedding)
         })
     } catch (e) {
         next(e)
