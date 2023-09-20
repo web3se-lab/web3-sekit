@@ -59,9 +59,8 @@ async function vulnerability(req, res, next) {
         const data = await $vul.findOneByPk(key)
         if (!data) throw new Error(`${key} not found`)
         return res.json({
-            data: data.SourceCode,
-            label: type.vulnerability[data.Vulnerability],
-            vulnerability: data.Vulnerability,
+            content: data.SourceCode,
+            vulnerability: JSON.parse(data.Vulnerability),
             embedding: JSON.parse(data.Embedding)
         })
     } catch (e) {
