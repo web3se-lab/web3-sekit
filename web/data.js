@@ -58,8 +58,10 @@ async function vulnerability(req, res, next) {
         const key = req.body.key // key is for token table
         const data = await $vul.findOneByPk(key)
         if (!data) throw new Error(`${key} not found`)
+        const type = 'solidity'
         return res.json({
             content: data.SourceCode,
+            tree: $.getCodeMap($.clearCode(data.SourceCode, type), type),
             vulnerability: JSON.parse(data.Vulnerability),
             embedding: JSON.parse(data.Embedding)
         })
