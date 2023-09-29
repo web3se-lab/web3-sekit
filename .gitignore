@@ -9,6 +9,7 @@ yarn.lock
 db/data.json
 db/data.txt
 db/resource
+db/resource2
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
