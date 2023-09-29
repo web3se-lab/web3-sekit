@@ -1,4 +1,4 @@
-const { findOneByPk, findOneByAddress, count, maxId } = require('../src/getContract')
+const { findOneByPk, findOneByAddress, count, maxId } = require('../db/contract')
 
 async function get(req, res, next) {
     try {

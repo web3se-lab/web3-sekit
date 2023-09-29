@@ -96,7 +96,10 @@ module.exports = {
         table: {
             Id: { type: DataTypes.INTEGER(11), primaryKey: true, autoIncrement: true },
             SourceCode: DataTypes.TEXT('medium'),
-            Vulnerability: DataTypes.STRING
+            Vulnerability: DataTypes.STRING,
+            Embedding: DataTypes.TEXT('long'),
+            EmbeddingMax: DataTypes.TEXT('long'),
+            File: DataTypes.STRING
         },
         options: {
             charset: 'utf8mb4',
