@@ -24,8 +24,8 @@ app.use(multer().array())
 
 app.get('/', (_, res) => {
     res.send(`
-        <h1>SmartIntentNN API</h1>
-        <a href="https://github.com/devilyouwei/SmartIntent">See Documentation</a>`)
+        <h1>Web3 Crack API</h1>
+        <a href="https://github.com/decentralizedlab/web3-crack">See Documentation</a>`)
 })
 
 const statics = ['evaluates', 'models']

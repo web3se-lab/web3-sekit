@@ -25,9 +25,7 @@ module.exports = {
             SwarmSource: DataTypes.STRING,
             Creator: DataTypes.STRING,
             ContractType: DataTypes.STRING,
-            Embedding: DataTypes.TEXT('long'),
-            EmbeddingMax: DataTypes.TEXT('long'),
-            TokenIds: DataTypes.TEXT('long')
+            Embedding: DataTypes.TEXT('long')
         },
         options: {
             charset: 'utf8mb4',
@@ -55,51 +53,21 @@ module.exports = {
         name: 'token',
         table: {
             Id: { type: DataTypes.INTEGER(11), primaryKey: true, autoIncrement: true },
-            ContractAddress: { type: DataTypes.STRING, unique: true },
-            Holders: DataTypes.INTEGER(11).UNSIGNED,
-            Transfers: DataTypes.INTEGER(11).UNSIGNED,
-            Supply: DataTypes.DOUBLE,
-            Decimals: DataTypes.INTEGER(11).UNSIGNED,
-            IsHoneypot: DataTypes.BOOLEAN,
-            Error: DataTypes.STRING,
-            MaxTxAmount: DataTypes.DOUBLE,
-            MaxTxAmountBNB: DataTypes.DECIMAL(65, 18),
-            BuyTax: DataTypes.INTEGER(11),
-            SellTax: DataTypes.INTEGER(11),
-            BuyGas: DataTypes.INTEGER(11).UNSIGNED,
-            SellGas: DataTypes.INTEGER(11).UNSIGNED,
-            BNBLP: DataTypes.DECIMAL(65, 18),
-            BUSDLP: DataTypes.DECIMAL(65, 18),
-            TokenType: DataTypes.STRING,
-            Price: DataTypes.DECIMAL(65, 2),
-            BNB: DataTypes.DECIMAL(65, 18),
-            Market: DataTypes.DOUBLE,
-            // LOW=1, MEDIUM=2, HIGH=3
+            ContractId: { type: DataTypes.INTEGER(11), unique: true },
             Risk: { type: DataTypes.INTEGER(11).UNSIGNED, defaultValue: 0 },
-            Scams: DataTypes.TEXT,
-            IsProxy: DataTypes.BOOLEAN
+            Scams: DataTypes.TEXT
         },
         options: {
             charset: 'utf8mb4',
-            collate: 'utf8mb4_general_ci',
-            indexes: [
-                {
-                    name: 'token_type_index',
-                    method: 'BTREE',
-                    fields: ['TokenType']
-                }
-            ]
+            collate: 'utf8mb4_general_ci'
         }
     },
     Vulnerability: {
         name: 'vulnerability',
         table: {
             Id: { type: DataTypes.INTEGER(11), primaryKey: true, autoIncrement: true },
-            SourceCode: DataTypes.TEXT('medium'),
-            Vulnerability: DataTypes.STRING,
-            Embedding: DataTypes.TEXT('long'),
-            EmbeddingMax: DataTypes.TEXT('long'),
-            File: DataTypes.STRING
+            ContractId: { type: DataTypes.INTEGER(11), unique: true },
+            Vulnerability: DataTypes.TEXT
         },
         options: {
             charset: 'utf8mb4',

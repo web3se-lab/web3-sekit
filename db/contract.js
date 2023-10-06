@@ -33,11 +33,6 @@ async function insert(data) {
     return row
 }
 
-async function removeNull() {
-    const row = await T.destroy({ where: { SourceCode: '' } })
-    return row
-}
-
 async function getNetworkById(id) {
     const res = await T.findByPk(id, { attributes: ['Network'] })
     console.log('Network', res.Network)
@@ -130,21 +125,6 @@ async function getEmbeddingByAddress(ContractAddress, pool = 'Embedding') {
     else return null
 }
 
-async function getTokenIdsById(id) {
-    const res = await T.findByPk(id, { attributes: ['TokenIds'] })
-    if (res && res.TokenIds) return JSON.parse(res.TokenIds)
-    else return null
-}
-
-async function getTokenIdsByAddress(ContractAddress) {
-    const res = await T.findOne({
-        where: { ContractAddress },
-        attributes: ['TokenIds']
-    })
-    if (res && res.TokenIds) return JSON.parse(res.TokenIds)
-    else return null
-}
-
 if (process.argv[1].includes('db/contract')) {
     if (process.argv[2] == 'count') count().then(r => console.log(r))
     if (process.argv[2] == 'max') maxId().then(r => console.log(r))
@@ -154,14 +134,11 @@ if (process.argv[1].includes('db/contract')) {
         else findOneByPk(parseInt(process.argv[3])).then(r => console.log(r.dataValues))
     }
     if (process.argv[2] == 'check') check(process.argv[3]).then(r => console.log(r))
-    if (process.argv[2] == 'remove-null') removeNull()
     if (process.argv[2] == 'network') {
         if (process.argv[3].substring(0, 2) == '0x') getNetwork(process.argv[3]).then(r => console.log(r))
         else getNetworkById(process.argv[3]).then(r => console.log(r))
     }
     if (process.argv[2] == 'embed') getEmbeddingById(process.argv[3]).then(r => console.log(r))
-    if (process.argv[2] == 'embed-max') getEmbeddingById(process.argv[3], 'EmbeddingMax').then(r => console.log(r))
-    if (process.argv[2] == 'tokenize') getTokenIdsById(process.argv[3]).then(r => console.log(r))
 }
 
 module.exports = {
@@ -173,7 +150,6 @@ module.exports = {
     insert,
     upsert,
     updateByAddress,
-    removeNull,
     getNetworkById,
     getNetwork,
     getCodeByAddress,
@@ -181,7 +157,5 @@ module.exports = {
     getCodeMapById,
     getCodeMapByAddress,
     getEmbeddingById,
-    getEmbeddingByAddress,
-    getTokenIdsById,
-    getTokenIdsByAddress
+    getEmbeddingByAddress
 }

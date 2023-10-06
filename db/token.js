@@ -13,14 +13,6 @@ async function maxId() {
     return res
 }
 
-async function findOneByAddress(address, attributes) {
-    const options = { where: { ContractAddress: address } }
-    if (attributes) options.attributes = attributes
-    const res = await T.findOne(options)
-    if (process.argv[2] == 'get') console.log(res.dataValues)
-    return res
-}
-
 async function findOneByPk(id, attributes) {
     const options = {}
     if (attributes) options.attributes = attributes
@@ -36,12 +28,9 @@ async function upsert(data) {
 }
 
 if (process.argv[1].includes('db/token')) {
-    if (process.argv[2] == 'get') {
-        if (process.argv[3].substring(0, 2) == '0x') findOneByAddress(process.argv[3])
-        else findOneByPk(parseInt(process.argv[3]))
-    }
+    if (process.argv[2] == 'get') findOneByPk(parseInt(process.argv[3]))
     if (process.argv[2] == 'count') count()
     if (process.argv[2] == 'max') maxId()
 }
 
-module.exports = { findOneByPk, findOneByAddress, count, maxId, upsert }
+module.exports = { findOneByPk, count, maxId, upsert }

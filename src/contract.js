@@ -2,10 +2,10 @@ const xlsx = require('node-xlsx').default
 const ROOT = require('app-root-path')
 const cheerio = require('cheerio')
 const FILE = `${ROOT}/db/contracts5.csv`
-const $contract = require('./getContract')
-const $token = require('./getToken')
+const $contract = require('../db/contract')
+const $token = require('../db/token')
 const { sleep, get, getAPI } = require('./utils')
-const { embedAPI, tokenizeAPI, removeBr } = require('../tensorflow/utils')
+const { embedAPI, tokenizeAPI, removeBr } = require('../tf/utils')
 const NETWORK = 'ethMain'
 const config = require('../config/network.json')[NETWORK]
 

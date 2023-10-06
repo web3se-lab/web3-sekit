@@ -2,7 +2,6 @@ const ROOT = require('app-root-path')
 const $data = require('../db/data')
 const $vul = require('../db/vulnerability')
 const $contract = require('../db/contract')
-const type = require('./type')
 const { embed } = require('../tf/modules/embedding')
 const $ = require('../src/utils')
 
@@ -53,18 +52,13 @@ async function intent(req, res, next) {
         next(e)
     }
 }
+
 async function vulnerability(req, res, next) {
     try {
         const key = req.body.key // key is for token table
-        const data = await $vul.findOneByPk(key)
+        const data = await $data.getSourceCodeVulnerability(key)
         if (!data) throw new Error(`${key} not found`)
-        const type = 'solidity'
-        return res.json({
-            content: data.SourceCode,
-            tree: $.getCodeMap($.clearCode(data.SourceCode, type), type),
-            vulnerability: JSON.parse(data.Vulnerability),
-            embedding: JSON.parse(data.Embedding)
-        })
+        return res.json(data)
     } catch (e) {
         next(e)
     }
