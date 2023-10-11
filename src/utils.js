@@ -1,4 +1,5 @@
 const $ = require('superagent')
+const axios = require('axios')
 const request = require('request')
 const config = require('../config/network.json')
 const puppeteer = require('puppeteer-extra')
@@ -17,6 +18,11 @@ const utils = {
         })
         const html = res.text
         return html
+    },
+    async post(url, query = {}, config = {}) {
+        console.log('request', url)
+        console.log('query', query)
+        return (await axios.post(url, query, config)).data
     },
     async json(url, query = {}) {
         const res = await this.get(url, query)

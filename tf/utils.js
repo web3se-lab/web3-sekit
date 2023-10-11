@@ -1,7 +1,7 @@
 require('dotenv').config()
 const TYPE = require('./type')
 const FormData = require('form-data')
-const fetch = require('cross-fetch')
+const axios = require('axios')
 
 const UNIT = 32 // LSTM hidden units
 const DIST = 0.2 // highlight within distance bound
@@ -23,14 +23,23 @@ module.exports = {
         const url = `${process.env.EMBED_API}/${method}`
         const form = new FormData()
         form.append('text', text)
-        const res = await fetch(url, { method: 'post', body: form }).then(res => res.json())
-        return res.embedding
+        const response = await axios.post(url, form, {
+            headers: {
+                ...form.getHeaders() // Include necessary headers from FormData
+            }
+        })
+        return response.data.embedding
     },
     async tokenizeAPI(text) {
         const url = `${process.env.EMBED_API}/tokenize`
         const form = new FormData()
         form.append('text', text)
-        return await fetch(url, { method: 'post', body: form }).then(res => res.json())
+        const response = await axios.post(url, form, {
+            headers: {
+                ...form.getHeaders() // Include necessary headers from FormData
+            }
+        })
+        return response.data
     },
     removeBr(text) {
         /*

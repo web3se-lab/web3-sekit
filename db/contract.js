@@ -78,9 +78,7 @@ async function getCodeById(id) {
 }
 
 async function getCodeMapById(id) {
-    const res = await T.findByPk(id, {
-        attributes: codeAttributes
-    })
+    const res = await T.findByPk(id, { attributes: codeAttributes })
     if (!res) return res
     const type = res.CompilerVersion.includes('vyper') ? 'vyper' : 'solidity'
     const code = $.getCodeMap($.clearCode($.multiContracts(res.SourceCode), type), type)
