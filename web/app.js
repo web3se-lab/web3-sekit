@@ -1,7 +1,5 @@
 require('dotenv').config()
-const ROOT = require('app-root-path')
 const express = require('express')
-const serveIndex = require('serve-index')
 const multer = require('multer')
 const app = express()
 const CTRL = require('app-root-path') + '/web/'
@@ -28,17 +26,10 @@ app.get('/', (_, res) => {
         <a href="https://github.com/decentralizedlab/web3-crack">See Documentation</a>`)
 })
 
-const statics = ['evaluates', 'models']
-app.use('/evaluates', express.static(`${ROOT}/tf/evaluates`))
-app.use('/evaluates', serveIndex(`${ROOT}/tf/evaluates`, { icons: true }))
-app.use('/models', express.static(`${ROOT}/tf/models`))
-app.use('/models', serveIndex(`${ROOT}/tf/models`, { icons: true }))
-
 app.all('*', (req, res, next) => {
     try {
         const path = req.path.toString()
         const ctl = path.split('/')[1]
-        if (statics.includes(ctl)) return next()
         if (req.method == 'GET') req.body = req.query // get强制转post参数
 
         // MVC

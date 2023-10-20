@@ -1,6 +1,5 @@
 const ROOT = require('app-root-path')
 const $data = require('../db/data')
-const $vul = require('../db/vulnerability')
 const $contract = require('../db/contract')
 const { embed } = require('../tf/modules/embedding')
 const $ = require('../src/utils')

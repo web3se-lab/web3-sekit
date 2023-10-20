@@ -120,3 +120,9 @@ tf/logs/*
 
 tf/evaluates/*
 !tf/evaluates/.gitkeep
+
+static/contract/*
+!static/contract/.gitkeep
+
+static/solc/*
+!static/solc/.gitkeep

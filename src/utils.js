@@ -1,4 +1,3 @@
-const $ = require('superagent')
 const axios = require('axios')
 const request = require('request')
 const config = require('../config/network.json')
@@ -9,20 +8,15 @@ const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker')
 puppeteer.use(AdblockerPlugin({ blockTrackers: true }))
 
 const utils = {
-    async get(url, query = {}) {
-        console.log('request', url)
-        console.log('query', query)
-        const res = await $.get(url).query(query).timeout({
-            response: 10000, // Wait 5 seconds for the server to start sending,
-            deadline: 60000 // but allow 1 minute for the file to finish loading.
-        })
-        const html = res.text
-        return html
+    async get(url, params = {}, config = {}) {
+        console.log(url)
+        const res = await axios.get(url, { params, config })
+        return res.data
     },
     async post(url, query = {}, config = {}) {
-        console.log('request', url)
-        console.log('query', query)
-        return (await axios.post(url, query, config)).data
+        console.log(url)
+        const res = await axios.post(url, query, config)
+        return res.data
     },
     async json(url, query = {}) {
         const res = await this.get(url, query)
@@ -237,6 +231,17 @@ const utils = {
         } catch (e) {
             return []
         }
+    },
+    mdCode(text = '') {
+        // Regular expression to match code blocks
+        const codeBlockRegex = /```\w+\n([\s\S]*?)```/g
+
+        // Extract code blocks
+        const codeBlocks = []
+        let match
+        while ((match = codeBlockRegex.exec(text)) !== null) codeBlocks.push(match[1])
+
+        return codeBlocks
     }
 }
 module.exports = utils

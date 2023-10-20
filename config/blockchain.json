@@ -1,0 +1,14 @@
+{
+    "lechain": {
+        "type": 1,
+        "typeName": "consortium blockchain",
+        "rpc": [
+            "http://192.168.99.244:5000/front",
+            "http://192.168.99.244:5001/front",
+            "http://192.168.99.244:5002/front",
+            "http://192.168.99.244:5003/front"
+        ],
+        "groupId": 1,
+        "user": "0x23e1e6f60e7e869fd853e22b37203cc5fec9490d"
+    }
+}
