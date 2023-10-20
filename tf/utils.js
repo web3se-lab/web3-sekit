@@ -2,6 +2,7 @@ require('dotenv').config()
 const TYPE = require('./type')
 const FormData = require('form-data')
 const axios = require('axios')
+const tf = require(process.env.TFJS)
 
 const UNIT = 32 // LSTM hidden units
 const DIST = 0.2 // highlight within distance bound
@@ -60,5 +61,6 @@ module.exports = {
     CLS: CLS,
     SEP: SEP,
     MASK: MASK,
-    VOC: VOC
+    VOC: VOC,
+    tf: tf
 }

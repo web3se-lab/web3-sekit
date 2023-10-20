@@ -12,6 +12,8 @@ const CHAIN = require('../config/blockchain.json')
 
 const API = process.env.UNIAI_API
 const TOKEN = process.env.UNIAI_TOKEN
+const MODEL = process.env.MODEL
+const SUBMODEL = process.env.SUBMODEL
 
 async function config(_, res) {
     try {
@@ -36,30 +38,36 @@ async function download(req, res, next) {
 
 async function generate(req, res) {
     try {
+        res.setHeader('Content-Type', 'text/event-stream')
+        res.setHeader('Cache-Control', 'no-cache')
+        res.setHeader('Connection', 'keep-alive')
+
         const { title, type, pragma, description, params } = req.body
-        const model = req.body.model || 'GPT'
-        const subModel = req.body.subModel || 'gpt-turbo-3.5'
         const chunk = req.body.chunk || false
         if (!title) throw new Error('no title')
         const content = `
-            根据要求用solidity写智能合约，给出完整可编译使用的智能合约代码，最后给出代码解释：
-            - SPDX-License-Identifier: UNLICENSED
-            - 智能合约名称: ${title}，用英文
-            - 智能合约类别：${type}
-            - 智能合约功能需求：${description}
-            - 智能合约 pragma：${pragma}
-            - 以下是自定义的其他变量或函数：${JSON.stringify(params)}
+            根据需求用Solidity写一份智能合约，要求给出完整功能的智能合约代码，保证代码可编译且可使用，在最后解释代码：
+            - 头部加上注释协议：SPDX-License-Identifier: UNLICENSED
+            - 智能合约编译版本 pragma：${pragma}
+            - 智能合约名称：${title}，代码中用英文
+            - 智能合约类别${type}
+            - 智能合约主要功能需求，必须实现且可用：${description}
+            - 以下是自定义的其他变量或函数，必须全部实现且可用：${JSON.stringify(params)}
         `
 
         const message = await $.post(
             `${API}/ai/chat-stream`,
-            { prompts: [{ role: 'user', content }], chunk, model, subModel },
+            {
+                prompts: [{ role: 'user', content }],
+                chunk,
+                model: MODEL,
+                subModel: SUBMODEL,
+                temperature: 0.85,
+                top: 0.2
+            },
             { responseType: 'stream', headers: { token: TOKEN } }
         )
 
-        res.setHeader('Content-Type', 'text/event-stream')
-        res.setHeader('Cache-Control', 'no-cache')
-        res.setHeader('Connection', 'keep-alive')
         let cache
         const parser = createParser(e => {
             if (e.type === 'event') {
@@ -93,22 +101,20 @@ async function generate(req, res) {
 
 async function check(req, res) {
     try {
-        const { file } = req.body
-        if (!file) throw new Error('No file id')
-        const model = req.body.model || 'GPT'
-        const subModel = req.body.subModel || 'gpt-turbo-3.5'
-        const chunk = req.body.chunk || false
-        const code = fs.readFileSync(`${ROOT}/static/contract/${file}.sol`)
-        const content = `请对以下智能合约代码进行检测：漏洞、恶意代码、命名规范、算法逻辑、语法、冗余代码。如有问题，请给出优化建议，并给出优化方案，待检测代码如下：\n${code}`
-        const message = await $.post(
-            `${API}/ai/chat-stream`,
-            { prompts: [{ role: 'user', content }], chunk, model, subModel },
-            { responseType: 'stream', headers: { token: TOKEN } }
-        )
-
         res.setHeader('Content-Type', 'text/event-stream')
         res.setHeader('Cache-Control', 'no-cache')
         res.setHeader('Connection', 'keep-alive')
+
+        const { file } = req.body
+        if (!file) throw new Error('No file id')
+        const chunk = req.body.chunk || false
+        const code = fs.readFileSync(`${ROOT}/static/contract/${file}.sol`)
+        const content = `对以下智能合约代码进行检测：漏洞、恶意代码、命名规范、算法逻辑、语法、冗余代码\n如有问题，请给出优化建议，并给出优化方案\n待检测代码如下：\n${code}`
+        const message = await $.post(
+            `${API}/ai/chat-stream`,
+            { prompts: [{ role: 'user', content }], chunk, model: MODEL, subModel: SUBMODEL },
+            { responseType: 'stream', headers: { token: TOKEN } }
+        )
 
         message.on('data', buff => res.write(buff))
         message.on('end', () => res.end())
@@ -121,7 +127,8 @@ async function check(req, res) {
 
 async function compile(req, res) {
     try {
-        const { file, code } = req.body
+        const { file } = req.body
+        const code = $.mdCode(req.body.code)[0]
         let content
         if (file) content = fs.readFileSync(`${ROOT}/static/contract/${file}.sol`, 'utf-8')
         if (code) content = code
@@ -152,7 +159,7 @@ async function compile(req, res) {
         const output = JSON.parse(compiler.compile(JSON.stringify(input)))
         fs.writeFileSync(`${ROOT}/static/contract/${file}.json`, JSON.stringify(output))
 
-        if (output.errors && output.errors.length) throw new Error(output.errors[0].message)
+        if (output.errors && output.errors.length) throw new Error(JSON.stringify(output.errors[0]))
         res.json({ status: 1, data: output, msg: `success compiled by ${compileVersion}` })
     } catch (e) {
         console.error(e)

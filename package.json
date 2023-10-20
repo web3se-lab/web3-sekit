@@ -1,9 +1,9 @@
 {
     "name": "web3-crack",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "author": "devilyouwei",
     "license": "MIT",
-    "description": "A tool for web3, blockchain, smart contract, API interaction, data crawler, and data analysis by machine learning.",
+    "description": "Utils for Web3, Blockchain, Smart Contract with API interaction, data crawler, and data analysis features.",
     "main": "index.js",
     "scripts": {
         "format": "prettier 'src/*.js' --write",
