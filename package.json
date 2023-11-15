@@ -3,8 +3,8 @@
     "version": "1.2.0",
     "author": "devilyouwei",
     "license": "MIT",
-    "description": "Utils for Web3, Blockchain, Smart Contract with API interaction, data crawler, and data analysis features.",
-    "main": "index.js",
+    "description": "Automated utils for Web3, Blockchain and Smart Contracts.",
+    "main": "web/app.js",
     "scripts": {
         "format": "prettier 'src/*.js' --write",
         "clean": "rm -rf ./tf/logs/**/train ./tf/mymodels/**/*",
@@ -19,10 +19,10 @@
         "scamsniper": "node ./src/scamsniper.js",
         "safu": "node ./src/safu.js",
         "tokenizer": "node ./tensorflow/tokenizer.js",
-        "dev": "pm2-dev start pm2.config.js",
-        "restart": "pm2 restart pm2.config.js",
-        "start": "pm2 start pm2.config.js",
-        "stop": "pm2 stop pm2.config.js",
+        "dev": "pm2-dev start ./web/app.js",
+        "restart": "pm2 restart ./web/app.js",
+        "start": "pm2 start ./web/app.js",
+        "stop": "pm2 stop ./web/app.js",
         "status": "pm2 status",
         "delete": "pm2 delete app",
         "pm2-update": "pm2 update",
@@ -46,7 +46,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/MUST-ISDA/web3-crack.git"
+        "url": "git+https://github.com/decentralizedlab/web3-crack"
     },
     "keywords": [
         "web3",
@@ -55,9 +55,9 @@
         "crawler"
     ],
     "bugs": {
-        "url": "https://github.com/MUST-ISDA/web3-crack/issues"
+        "url": "https://github.com/decentralizedlab/web3-crack/issues"
     },
-    "homepage": "https://github.com/MUST-ISDA/web3-crack#readme",
+    "homepage": "https://github.com/decentralizedlab/web3-crack/web3-crack#readme",
     "devDependencies": {
         "@types/serve-index": "^1.9.1",
         "eslint": "^8.33.0",

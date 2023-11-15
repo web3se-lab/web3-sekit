@@ -45,8 +45,11 @@ async function generate(req, res) {
         const { title, type, pragma, description, params } = req.body
         const chunk = req.body.chunk || false
         if (!title) throw new Error('no title')
+        if (!type) throw new Error('no contract type')
+        if (!pragma) throw new Error('no pragma version')
+
         const content = `
-            根据需求用Solidity写一份智能合约，要求给出完整功能的智能合约代码，保证代码可编译且可使用，在最后解释代码：
+            根据需求用Solidity写一份智能合约，给出完整功能的智能合约代码，保证代码正确，在最后解释代码：
             - 头部加上注释协议：SPDX-License-Identifier: UNLICENSED
             - 智能合约编译版本 pragma：${pragma}
             - 智能合约名称：${title}，代码中用英文
@@ -62,8 +65,7 @@ async function generate(req, res) {
                 chunk,
                 model: MODEL,
                 subModel: SUBMODEL,
-                temperature: 0.85,
-                top: 0.2
+                temperature: 0.85
             },
             { responseType: 'stream', headers: { token: TOKEN } }
         )
@@ -84,10 +86,10 @@ async function generate(req, res) {
                 // write to file
                 const code = $.mdCode(content)[0]
                 const filename = md5(code)
-                cache.data.file = filename
-                cache.data.code = code
                 fs.writeFileSync(`${ROOT}/static/contract/${filename}.sol`, code)
                 fs.writeFileSync(`${ROOT}/static/contract/${filename}.md`, content)
+                cache.data.file = filename
+                cache.data.code = code
                 res.write(`data: ${JSON.stringify(cache)}\n\n`)
             }
             res.end()
@@ -127,14 +129,13 @@ async function check(req, res) {
 
 async function compile(req, res) {
     try {
-        const { file } = req.body
-        const code = $.mdCode(req.body.code)[0]
+        const { file, code } = req.body
         let content
-        if (file) content = fs.readFileSync(`${ROOT}/static/contract/${file}.sol`, 'utf-8')
+        if (file) content = fs.readFileSync(`${ROOT}/static/contract/${file}.sol`)
         if (code) content = code
         if (!content) throw new Error('Smart contract code is null')
 
-        const version = content.match(/pragma\s+solidity\s+(\^\d+\.\d+\.\d+);/i)
+        const version = content.match(/pragma\s+solidity\s+(\^?\d+\.\d+\.\d+);/i)
         if (!version[1]) throw new Error('Can not detect smart contract pragma version')
 
         const list = JSON.parse(fs.readFileSync(`${ROOT}/config/solc.json`))
@@ -143,11 +144,13 @@ async function compile(req, res) {
 
         const compilerFile = `${ROOT}/static/solc/${compileVersion}`
         if (!fs.existsSync(compilerFile)) {
+            console.log('Downloading', compilerFile)
             // download compiler
             const response = await fetch(`${CONF.list}/bin/${compileVersion}`)
             const code = await response.text()
             if (code) fs.writeFileSync(`${ROOT}/static/solc/${compileVersion}`, code)
             else throw new Error(`Can not find compiler: ${compileVersion}`)
+            console.log('Downloaded', compilerFile)
         }
 
         const compiler = solc.setupMethods(require(compilerFile))
@@ -160,7 +163,7 @@ async function compile(req, res) {
         fs.writeFileSync(`${ROOT}/static/contract/${file}.json`, JSON.stringify(output))
 
         if (output.errors && output.errors.length) throw new Error(JSON.stringify(output.errors[0]))
-        res.json({ status: 1, data: output, msg: `success compiled by ${compileVersion}` })
+        res.json({ status: 1, data: output, msg: `Success compiled by ${compileVersion}` })
     } catch (e) {
         console.error(e)
         res.json({ status: 0, msg: e.message })
@@ -170,19 +173,22 @@ async function compile(req, res) {
 async function deploy(req, res) {
     try {
         const abi = JSON.parse(req.body.abi)
-        const bytecode = JSON.parse(req.body.bytecode)
         const params = JSON.parse(req.body.params)
+        const key = Object.keys(abi)[0]
+
         const chain = req.body.chain || 'lechain'
         if (chain === 'lechain') {
             const { lechain } = CHAIN
+            console.log(JSON.stringify(abi[key].abi))
 
-            const data = await $.post(`${lechain.rpc[0]}/contract/deploy`, {
-                abiInfo: abi,
-                bytecodeBin: bytecode.object,
+            const body = {
+                abiInfo: abi[key].abi,
+                bytecodeBin: abi[key].evm.bytecode.object,
                 funcParam: params,
                 groupId: lechain.groupId,
                 user: lechain.user
-            })
+            }
+            const data = await $.post(`${lechain.rpc[0]}/contract/deploy`, body)
             res.json({ status: 1, data, msg: 'Deploy success' })
         } else throw new Error('Unrecognized blockchain')
     } catch (e) {

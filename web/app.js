@@ -1,9 +1,12 @@
 require('dotenv').config()
+
 const express = require('express')
 const multer = require('multer')
-const app = express()
-const CTRL = require('app-root-path') + '/web/'
+const ROOT = require('app-root-path')
 const bodyParser = require('body-parser')
+
+const app = express()
+const CTRL = `${ROOT}/web/`
 
 // cross domain
 const allowCrossDomain = function (req, res, next) {
@@ -11,12 +14,14 @@ const allowCrossDomain = function (req, res, next) {
     res.header('Access-Control-Allow-Methods', 'GET,POST')
     res.header('Access-Control-Allow-Headers', 'Content-Type')
     res.header('Access-Control-Allow-Credentials', 'true')
-    if (req.method.toLowerCase() == 'options') res.send(200)
-    else next()
+    if (req.method.toLowerCase() == 'options') return res.send(200)
+    const path = req.path.split('/')
+    if (path[path.length - 1] === 'favicon.ico') return res.send(`${ROOT}/static/favicon.ico`)
+    next()
 }
 
-app.use(bodyParser.urlencoded({ extended: true }))
-app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }))
+app.use(bodyParser.json({ limit: '10mb' }))
 app.use(allowCrossDomain)
 app.use(multer().array())
 
@@ -28,7 +33,7 @@ app.get('/', (_, res) => {
 
 app.all('*', (req, res, next) => {
     try {
-        const path = req.path.toString()
+        const path = req.path
         const ctl = path.split('/')[1]
         if (req.method == 'GET') req.body = req.query // get强制转post参数
 
@@ -43,4 +48,5 @@ app.all('*', (req, res, next) => {
 })
 
 app.listen(process.env.WEB_PORT)
+
 console.log('Server Started')
