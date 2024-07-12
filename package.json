@@ -1,9 +1,9 @@
 {
-    "name": "web3-crack",
-    "version": "1.2.0",
+    "name": "web3-sekit",
+    "version": "2.0.0",
     "author": "devilyouwei",
     "license": "MIT",
-    "description": "Automated utils for Web3, Blockchain and Smart Contracts.",
+    "description": "Automated software engineering kits for Web3, Blockchain and Smart Contracts.",
     "main": "web/app.js",
     "scripts": {
         "format": "prettier 'src/*.js' --write",
@@ -46,18 +46,21 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/decentralizedlab/web3-crack"
+        "url": "git+https://github.com/decentralizedlab/web3-sekit"
     },
     "keywords": [
         "web3",
         "blockchain",
         "smart contract",
-        "crawler"
+        "crawler",
+        "software engineering",
+        "AI",
+        "deep learning"
     ],
     "bugs": {
-        "url": "https://github.com/decentralizedlab/web3-crack/issues"
+        "url": "https://github.com/decentralizedlab/web3-sekit/issues"
     },
-    "homepage": "https://github.com/decentralizedlab/web3-crack/web3-crack#readme",
+    "homepage": "http://web3.cas-ll.cn",
     "devDependencies": {
         "@types/serve-index": "^1.9.1",
         "eslint": "^8.33.0",
@@ -68,8 +71,8 @@
     },
     "dependencies": {
         "@stdlib/assert-is-json": "^0.1.1",
-        "@tensorflow/tfjs-node": "^4.10.0",
-        "@tensorflow/tfjs-node-gpu": "^4.10.0",
+        "@tensorflow/tfjs-node": "^4.20.0",
+        "@tensorflow/tfjs-node-gpu": "^4.20.0",
         "app-root-path": "^3.1.0",
         "axios": "^1.5.1",
         "bert-tokenizer": "^1.1.8",

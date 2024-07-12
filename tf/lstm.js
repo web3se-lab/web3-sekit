@@ -12,3 +12,4 @@ const nn = new MyModel('lstm')
 
 if (process.argv[2] == 'evaluate') nn.evaluate(process.argv[3], process.argv[4], process.argv[5])
 if (process.argv[2] == 'predict') nn.predict(process.argv[3], process.argv[4])
+if (process.argv[2] == 'summary') nn.summary()

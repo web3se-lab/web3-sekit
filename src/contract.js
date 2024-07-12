@@ -144,6 +144,7 @@ async function labelToken(start = 1, end) {
     }
 }
 
+// update smart contract token, tokenId
 async function tokenAll(start = 1, end) {
     const max = end || (await $contract.maxId())
     for (let i = start; i <= max; i++) {
@@ -153,13 +154,12 @@ async function tokenAll(start = 1, end) {
         const json = {}
         for (const i in code) {
             json[i] = {}
-            for (const j in code[i]) json[i][j] = await tokenizeAPI(removeBr(code[i][j])) // remove redundant spaces and br
+            for (const j in code[i]) {
+                json[i][j] = await tokenizeAPI(removeBr(code[i][j])).then(v => (json[i][j] = v))
+            }
         }
         console.log(json)
-        const data = {
-            Id: i,
-            TokenIds: JSON.stringify(json)
-        }
+        const data = { Id: i, TokenIds: JSON.stringify(json) }
         await $contract.upsert(data)
     }
 }

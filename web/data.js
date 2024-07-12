@@ -64,43 +64,37 @@ async function vulnerability(req, res, next) {
 }
 
 // get evaluation result data
-async function evaluate(_, res, next) {
+async function evaluate(req, res, next) {
     try {
-        const data = [
-            {
-                title: 'LSTM',
-                data: $.loadJson(`${EVA_PATH}/lstm.json`)
-            },
-            {
-                title: 'BiLSTM',
-                data: $.loadJson(`${EVA_PATH}/bilstm.json`)
-            },
-            {
-                title: 'CNN',
-                data: $.loadJson(`${EVA_PATH}/cnn.json`)
-            },
-            {
-                title: 'SmartBERT + Feedforward',
-                data: $.loadJson(`${EVA_PATH}/smartbert_dense.json`)
-            },
-            {
-                title: 'SmartBERT + LSTM',
-                data: $.loadJson(`${EVA_PATH}/smartbert_lstm.json`)
-            },
-            {
-                title: 'SmartBERT + BiLSTM',
-                data: $.loadJson(`${EVA_PATH}/smartbert_bilstm.json`)
-            },
-            {
-                title: 'SmartBERT + CNN',
-                data: $.loadJson(`${EVA_PATH}/smartbert_cnn.json`)
-            },
-            {
-                title: 'SmartBERT + Highlight + CNN',
-                data: $.loadJson(`${EVA_PATH}/smartbert_high_cnn.json`)
-            }
-        ]
-        return res.json(data)
+        const index = req.body.index
+        const version = parseInt(req.body.version)
+        const data = []
+        if (!version) {
+            // classic models, denote by v0
+            data.push({ title: 'Dense', data: `v${version}/dense.json` })
+            data.push({ title: 'LSTM', data: `v${version}/lstm.json` })
+            data.push({ title: 'BiLSTM', data: `v${version}/bilstm.json` })
+            data.push({ title: 'CNN', data: `v${version}/cnn.json` })
+        } else if (version === 1) {
+            // SmartIntentNN V1
+            data.push({ title: 'USE + LSTM', data: `v${version}/lstm.json` })
+            data.push({ title: 'USE + BiLSTM', data: `v${version}/bilstm.json` })
+            data.push({ title: 'USE + BiLSTM + Highlight (ScaleX2)', data: `v${version}/bilstm_scaleX2.json` })
+            data.push({
+                title: 'USE + BiLSTM + Highlight (ScaleX2, Dropout)',
+                data: `v${version}/bilstm_scaleX2_dropout.json`
+            })
+            data.push({ title: 'USE + BiLSTM + Highlight (ScaleX4)', data: `v${version}/bilstm_scaleX4.json` })
+            data.push({ title: 'USE + BiLSTM + Highlight (ScaleX10)', data: `v${version}/bilstm_scaleX10.json` })
+        } else if (version === 2) {
+            // SmartIntentNN V2
+            data.push({ title: 'SmartBERT + Dense', data: `v${version}/smartbert_dense.json` })
+            data.push({ title: 'SmartBERT + CNN', data: `v${version}/smartbert_cnn.json` })
+            data.push({ title: 'SmartBERT + LSTM', data: `v${version}/smartbert_lstm.json` })
+            data.push({ title: 'SmartBERT + BiLSTM', data: `v${version}/smartbert_bilstm.json` })
+        }
+
+        return res.json({ title: data[index].title, data: $.loadJson(`${EVA_PATH}/${data[index].data}`) })
     } catch (e) {
         next(e)
     }

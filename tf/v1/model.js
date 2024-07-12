@@ -1,6 +1,6 @@
 /**
  * The base model, only for extending
- * To extend, you need to complete buildModel, preX, and padding methods
+ * To extend, you need to complete buildModel and padding methods
  * @class MyModel
  */
 
@@ -8,10 +8,7 @@ const fs = require('fs')
 const ROOT = require('app-root-path')
 
 const $ = require('../utils')
-const { TokenHasContract } = require('../../db/data')
-
-const PAD_TKN = 512
-const PAD = 1
+const $data = require('../../db/data')
 
 module.exports = class MyModel {
     /**
@@ -21,8 +18,7 @@ module.exports = class MyModel {
      */
     constructor(name) {
         this.name = name
-        this.modelPath = `file://${ROOT}/tf/models/${name}/model.json` // python models
-        this.evaluatePath = `${ROOT}/tf/evaluates/${name}.json` // evaluate path
+        this.modelPath = `file://${ROOT}/tf/models/${name}`
         this.logPath = `${ROOT}/tf/logs/${name}`
         this.tf = $.tf
         this.TYPE = $.TYPE
@@ -41,34 +37,33 @@ module.exports = class MyModel {
      */
     buildModel() {}
 
-    // handle input-ready xs, lstm need padding
+    // handle input-ready xs, most need padding
     padding(xs) {
         // finding max length batch
         const maxLength = Math.max.apply(
             Math,
             xs.map(x => x.length)
         )
+        console.log('Padding...', maxLength)
+        xs = this.scale ? this.scale(xs) : xs
         return xs.map(x => {
-            while (x.length < maxLength) x.push(Array(PAD_TKN).fill(PAD))
+            console.log('Origin length', x.length)
+            while (x.length < maxLength) x.push(Array(x[0].length).fill(this.MASK))
+            console.log('Padded length-------->', x.length)
             return x
-        }) // return a matrix [batchSize, words, wordDim]
+        })
+        // return a matrix [batchSize, seq, dimension]
     }
 
-    // Need to change with model, this is for lstm/bilstm model example
-    preX(json) {
-        if (!json) return null
-
-        const data = JSON.parse(json)
+    // prepare x data
+    preX(xs = []) {
         const arr = []
-        for (const i in data) for (const j in data[i]) arr.push(data[i][j])
-        return arr
+        for (const i in xs) for (const j in xs[i]) arr.push(xs[i][j])
+        return this.embed(arr)
     }
 
-    // prepare y data, multihot of scam type
-    preY(json) {
-        if (!json) return null
-
-        const ys = JSON.parse(json)
+    // prepare y data
+    preY(ys) {
         const arr = new Array(Object.keys(this.TYPE).length).fill(0)
         for (const item of ys) arr[this.TYPE[item.type]] = 1
         return arr
@@ -76,16 +71,37 @@ module.exports = class MyModel {
 
     // load model from local
     async loadModel() {
-        console.log('Model Name', this.name)
-        console.log('Model Path', this.modelPath)
-        console.log('Model Logs', this.logPath)
-        console.log('Now Loading my model...from python convert tfjs')
-        return (this.model = await this.tf.loadLayersModel(this.modelPath))
+        try {
+            console.log('========================= Load My Model ==========================')
+            console.log('Model', this.name)
+            console.log('Path', this.modelPath)
+            console.log('Log', this.logPath)
+            console.log('Load mymodel...')
+            if (!this.mymodel) this.mymodel = await this.tf.loadLayersModel(`${this.modelPath}/model.json`)
+            console.log('========================= Load My Model ==========================')
+        } catch (e) {
+            console.log('xxxxxxxxxxxxxxxxxx Fail to load my model, Build my model xxxxxxxxxxxxxxxxx')
+            console.error(e.message)
+            if (!this.mymodel) this.mymodel = this.buildModel()
+            console.log('xxxxxxxxxxxxxxxxxx Fail to load my model, Build my model xxxxxxxxxxxxxxxxx')
+        } finally {
+            console.log('========================= Load Encoder ==========================')
+            if (!this.encoder)
+                this.encoder = await this.tf.node.loadSavedModel(`${ROOT}/tf/models/universal-sentence-encoder`)
+            console.log('========================= Load Encoder ==========================')
+        }
+    }
+
+    // embed string
+    embed(inputs = []) {
+        console.log('Embedding...', inputs.length)
+        inputs = this.tf.tensor(inputs)
+        return this.encoder.predict({ inputs }).outputs.arraySync()
     }
 
     // compile model if training
     compile() {
-        this.model.compile({
+        this.mymodel.compile({
             optimizer: 'adam',
             loss: 'binaryCrossentropy',
             metrics: ['accuracy']
@@ -116,23 +132,17 @@ module.exports = class MyModel {
             this.compile() // training needs to compile
 
             while (count < bs * batch) {
-                const res = await TokenHasContract(id, ['Id', 'Scams'], ['TokenIds', 'ContractAddress'])
-                console.log('Token Id', id)
-                id++
-                if (!res) continue
-
-                console.log('Address', res.contract.ContractAddress)
-                const x = this.preX(res.contract.TokenIds)
-                const y = this.preY(res.Scams)
-                if (x && y) {
-                    xs.push(x)
-                    ys.push(y)
+                const res = await $data.getSourceCodeScam(id)
+                if (res && res.risk && res.codeTree) {
+                    console.log('Id', id)
+                    console.log('Address', res.address)
+                    xs.push(this.preX(res.codeTree))
+                    ys.push(this.preY(res.risk))
                     if (xs.length === batch) {
                         const tx = this.tf.tensor(this.padding(xs))
                         console.log(tx)
-                        tx.print()
                         const ty = this.tf.tensor(ys)
-                        ty.print()
+                        console.log(ty)
                         await this.mymodel.fit(tx, ty, {
                             batchSize: batch,
                             shuffle: true,
@@ -143,20 +153,21 @@ module.exports = class MyModel {
                         ty.dispose()
                         xs = []
                         ys = []
-                        await this.model.save(this.modelPath)
                     }
                     count++
                     console.log('count', count)
                     console.log('Id', id)
-                    console.log('Address', res.contract.ContractAddress)
+                    console.log('Address', res.address)
                 }
+                id++
+                await this.mymodel.save(this.modelPath)
             }
         } catch (e) {
             console.error(e)
             console.log('id', id)
             console.log('count', count)
         } finally {
-            if (this.model) this.model.dispose()
+            if (this.mymodel) this.mymodel.dispose()
         }
     }
 
@@ -193,19 +204,14 @@ module.exports = class MyModel {
             await this.loadModel()
 
             while (count < slice) {
-                const res = await TokenHasContract(id, ['Id', 'Scams'], ['TokenIds', 'ContractAddress'])
-                console.log('Id', id)
-                id++
-                if (!res) continue
-
-                console.log('Evaluating')
-                console.log('Address', res.contract.ContractAddress)
-                const x = this.preX(res.contract.TokenIds)
-                const y = this.preY(res.Scams)
-                if (x && y) {
-                    const xs = [x]
-                    const yp = this.label(this.model.predict(this.tf.tensor(this.padding(xs))).arraySync()) // the predicting y
-                    const ya = this.label([y]) // the actual y
+                const res = await $data.getSourceCodeScam(id)
+                if (res && res.risk && res.codeTree) {
+                    console.log('Evaluating')
+                    console.log('Id', id)
+                    console.log('Address', res.address)
+                    const xs = [this.preX(res.codeTree)]
+                    const yp = this.label(this.mymodel.predict(this.tf.tensor(this.padding(xs))).arraySync()) // the predicting y
+                    const ya = this.label([this.preY(res.risk)]) // the actual y
                     console.log('Predict', yp)
                     console.log('Actual', ya)
                     const predict = yp.vector[0]
@@ -226,16 +232,17 @@ module.exports = class MyModel {
                     evas.push(JSON.parse(JSON.stringify(eva)))
                     count++
                 }
+                id++
             }
 
-            const path = this.evaluatePath
+            const path = `${this.logPath}/evaluate.json`
             fs.writeFileSync(path, JSON.stringify(evas))
             console.log(eva)
             console.log('Save to', path)
         } catch (e) {
             console.error(e)
         } finally {
-            if (this.model) this.model.dispose()
+            if (this.mymodel) this.mymodel.dispose()
         }
     }
 
@@ -250,21 +257,17 @@ module.exports = class MyModel {
             const xs = []
             const ys = []
             while (xs.length < slice) {
-                const res = await TokenHasContract(id, ['Id', 'Scams'], ['TokenIds', 'ContractAddress'])
-                if (res && res.contract.ContractAddress) {
-                    const x = this.preX(res.contract.TokenIds)
-                    const y = this.preY(res.Scams)
-                    if (x && y) {
-                        console.log('Predicting')
-                        console.log('Id', id)
-                        console.log('Address', res.contract.ContractAddress)
-                        xs.push(x)
-                        ys.push(y)
-                    }
+                const res = await $data.getSourceCodeScam(id)
+                if (res && res.risk && res.codeTree) {
+                    console.log('Predicting')
+                    console.log('Id', id)
+                    console.log('Address', res.address)
+                    xs.push(this.preX(res.codeTree))
+                    ys.push(this.preY(res.risk))
                 }
                 id++
             }
-            const yp = this.label(this.model.predict(this.tf.tensor(this.padding(xs))).arraySync())
+            const yp = this.label(this.mymodel.predict(this.tf.tensor(this.padding(xs))).arraySync())
             const ya = this.label(ys)
 
             console.log('Predict', yp)
@@ -272,7 +275,7 @@ module.exports = class MyModel {
         } catch (e) {
             console.error(e)
         } finally {
-            if (this.model) this.model.dispose()
+            if (this.mymodel) this.mymodel.dispose()
         }
     }
 
@@ -296,11 +299,11 @@ module.exports = class MyModel {
     async summary() {
         try {
             await this.loadModel()
-            this.model.summary()
+            this.mymodel.summary()
         } catch (e) {
             console.error(e)
         } finally {
-            if (this.model) this.model.dispose()
+            this.mymodel.dispose()
         }
     }
 }
