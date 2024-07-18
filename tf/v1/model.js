@@ -14,6 +14,10 @@ const UNIT = 32 // LSTM unit num for 1 layer
 const PAD = 0.0 // pad
 const DIM = 512 // dimension for sentence embedding
 const SEQ = 256 // seq num limit for lstm (max number of functions)
+const BATCH_SIZE = 50
+const BATCH = 200
+const START = 20000
+const EPOCH = 50
 
 module.exports = class MyModel {
     /**
@@ -107,7 +111,7 @@ module.exports = class MyModel {
     }
 
     // train model
-    async train(bs = 100, batch = 100, epoch = 50, id = 1) {
+    async train(bs = BATCH_SIZE, batch = BATCH, epoch = EPOCH, id = 1) {
         console.log('Training================================>')
 
         bs = parseInt(bs)
@@ -115,9 +119,10 @@ module.exports = class MyModel {
         epoch = parseInt(epoch)
         id = parseInt(id)
 
-        console.log('Total', bs * batch)
+        console.log('Batch Size', bs)
         console.log('Batch', batch)
         console.log('Epoch', epoch)
+        console.log('Total', bs * batch)
         console.log('From', id)
 
         let count = 0
@@ -136,13 +141,13 @@ module.exports = class MyModel {
                     console.log('Address', res.address)
                     xs.push(this.preX(res.codeTree))
                     ys.push(this.preY(res.risk))
-                    if (xs.length === batch) {
+                    if (xs.length === bs) {
                         const tx = this.tf.tensor(this.padding(xs))
                         console.log(tx)
                         const ty = this.tf.tensor(ys)
                         console.log(ty)
                         await this.mymodel.fit(tx, ty, {
-                            batchSize: batch,
+                            batchSize: bs,
                             shuffle: true,
                             epochs: epoch,
                             callbacks: callbacks
@@ -170,7 +175,7 @@ module.exports = class MyModel {
     }
 
     // change to Accuracy, Precision and Recall evaluate
-    async evaluate(id = 20000, slice = 10000) {
+    async evaluate(id = START, slice = 10000) {
         console.log('Evaluating================================>')
 
         id = parseInt(id)
