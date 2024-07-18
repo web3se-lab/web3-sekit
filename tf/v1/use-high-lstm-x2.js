@@ -12,7 +12,7 @@ class LSTMHighScale extends MyModel {
     // build my model structure
     buildModel() {
         const tf = this.tf
-        const mask = tf.layers.masking({ maskValue: this.MASK, inputShape: [null, 512] })
+        const mask = tf.layers.masking({ maskValue: this.PAD, inputShape: [this.SEQ, this.DIM] })
         const lstm = tf.layers.lstm({ units: this.UNIT, returnSequences: false })
         const sigmoid = tf.layers.dense({ units: Object.keys(this.TYPE).length, activation: 'sigmoid' })
         return tf.sequential({ layers: [mask, lstm, sigmoid] })

@@ -10,6 +10,11 @@ const ROOT = require('app-root-path')
 const $ = require('../utils')
 const $data = require('../../db/data')
 
+const UNIT = 32 // LSTM unit num for 1 layer
+const PAD = 0.0 // pad
+const DIM = 512 // dimension for sentence embedding
+const SEQ = 256 // seq num limit for lstm (max number of functions)
+
 module.exports = class MyModel {
     /**
      * input a mymodel name (important! determine the saved model and evaluation)
@@ -22,12 +27,10 @@ module.exports = class MyModel {
         this.logPath = `${ROOT}/tf/logs/${name}`
         this.tf = $.tf
         this.TYPE = $.TYPE
-        this.UNIT = $.UNIT
-        this.MASK = $.MASK
-        this.FUNS = $.FUNS
-        this.MULT = $.MULT
-        this.DIST = $.DIST
-        this.INPUT = $.INPUT
+        this.UNIT = UNIT
+        this.PAD = PAD
+        this.DIM = DIM
+        this.SEQ = SEQ
     }
 
     /**
@@ -39,20 +42,15 @@ module.exports = class MyModel {
 
     // handle input-ready xs, most need padding
     padding(xs) {
-        // finding max length batch
-        const maxLength = Math.max.apply(
-            Math,
-            xs.map(x => x.length)
-        )
-        console.log('Padding...', maxLength)
-        xs = this.scale ? this.scale(xs) : xs
-        return xs.map(x => {
-            console.log('Origin length', x.length)
-            while (x.length < maxLength) x.push(Array(x[0].length).fill(this.MASK))
-            console.log('Padded length-------->', x.length)
-            return x
-        })
-        // return a matrix [batchSize, seq, dimension]
+        return (this.scale ? this.scale(xs) : xs)
+            .map(x => {
+                console.log('Origin length', x.length)
+                while (x.length < this.SEQ) x.push(Array(this.DIM).fill(this.PAD))
+                console.log('Padded length-------->', x.length)
+                return x
+            })
+            .slice(0, this.SEQ)
+        // return a matrix [seq_len, dimension] -> [256, 512]
     }
 
     // prepare x data
@@ -109,7 +107,7 @@ module.exports = class MyModel {
     }
 
     // train model
-    async train(bs = 500, batch = 20, epoch = 30, id = 1) {
+    async train(bs = 100, batch = 100, epoch = 50, id = 1) {
         console.log('Training================================>')
 
         bs = parseInt(bs)
