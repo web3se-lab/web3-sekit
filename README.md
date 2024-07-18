@@ -53,9 +53,9 @@ Technical Guide:
 
 Technical Points:
 
--   SmartIntentNN V1.0 employs a Universal Sentence Encoder to generate smart contract embeddings.
--   The intent highlight model is trained using K-means clustering.
--   SmartIntentNN V2.0 will integrate SmartBERT to convert smart contracts into embeddings.
+-   SmartIntentNN V1.0 employs a **Universal Sentence Encoder** to generate smart contract embeddings.
+-   The intent highlight model is trained using **K-means clustering**.
+-   SmartIntentNN V2.0 will integrate **SmartBERT** to embed smart contracts.
 -   SmartIntentNN V2.0 is currently under construction. Stay tuned!
 
 ## Dataset

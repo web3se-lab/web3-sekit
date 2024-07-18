@@ -23,6 +23,17 @@ class BiLSTMHighScale extends MyModel {
     scale(xs) {
         // rank by distance desc
         console.log('==========================highlight scale padding==========================')
+        /*
+        console.log('Ranking....', 'DESC')
+        xs = xs.map(x =>
+            x.sort(
+                (x1, x2) =>
+                    kmeans.predict(this.tf.tensor(x2)).distance.arraySync()[0] -
+                    kmeans.predict(this.tf.tensor(x1)).distance.arraySync()[0]
+            )
+        )
+            */
+
         console.log('Scaling...', SCALE)
         return xs.map(x =>
             x.map(v =>

@@ -46,14 +46,12 @@ module.exports = class MyModel {
 
     // handle input-ready xs, most need padding
     padding(xs) {
-        return (this.scale ? this.scale(xs) : xs)
-            .map(x => {
-                console.log('Origin length', x.length)
-                while (x.length < this.SEQ) x.push(Array(this.DIM).fill(this.PAD))
-                console.log('Padded length-------->', x.length)
-                return x
-            })
-            .slice(0, this.SEQ)
+        return (this.scale ? this.scale(xs) : xs).map(x => {
+            console.log('Origin length', x.length)
+            while (x.length < this.SEQ) x.push(Array(this.DIM).fill(this.PAD))
+            console.log('Padded length-------->', x.length)
+            return x.slice(0, this.SEQ)
+        })
         // return a matrix [seq_len, dimension] -> [256, 512]
     }
 
@@ -111,7 +109,7 @@ module.exports = class MyModel {
     }
 
     // train model
-    async train(bs = BATCH_SIZE, batch = BATCH, epoch = EPOCH, id = 1) {
+    async train(bs = BATCH_SIZE, batch = BATCH, epoch = EPOCH, id = 455) {
         console.log('Training================================>')
 
         bs = parseInt(bs)
