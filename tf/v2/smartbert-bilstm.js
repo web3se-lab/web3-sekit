@@ -1,15 +1,14 @@
 /*
- * Use Single LSTM
+ * Use SmartBERT + LSTM
  * @Author: Youwei Huang
  * @Email: devilyouwei@foxmail.com
- * 2022-8-16
- * modified to class extending mode
+ * 2023-2-11
+ * modified to use python trained model
  */
 
-const MyModel = require('./my-model/mymodel')
+const MyModelSmartBert = require('../my-model/mymodel-smartbert')
 
-const nn = new MyModel('lstm')
+const nn = new MyModelSmartBert('smartbert_bilstm')
 
 if (process.argv[2] == 'evaluate') nn.evaluate(process.argv[3], process.argv[4], process.argv[5])
 if (process.argv[2] == 'predict') nn.predict(process.argv[3], process.argv[4])
-if (process.argv[2] == 'summary') nn.summary()

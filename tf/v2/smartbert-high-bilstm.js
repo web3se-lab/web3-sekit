@@ -4,8 +4,8 @@
  * @Email: devilyouwei@foxmail.com
  */
 
-const MyModelSmartBert = require('./my-model/mymodel-smartbert')
-const { load } = require('./modules/highlight')
+const MyModelSmartBert = require('../my-model/mymodel-smartbert')
+const { load } = require('../modules/highlight')
 const kmeans = load()
 const PAD = 0.0
 const DIM = 768

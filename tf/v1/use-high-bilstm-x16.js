@@ -6,25 +6,24 @@ const MyModel = require('./model')
 const load = require('./highlight')
 const kmeans = load()
 
-const SCALE = 10
+const SCALE = 16
 
-class BiLSTMHighScale extends MyModel {
+class BiLSTMHighScale16 extends MyModel {
     // build my model structure
     buildModel() {
         const tf = this.tf
         const mask = tf.layers.masking({ maskValue: this.PAD, inputShape: [this.SEQ, this.DIM] })
+        const lstm = tf.layers.bidirectional({ layer: tf.layers.lstm({ units: this.UNIT, returnSequences: false }) })
         const drop = tf.layers.dropout({ rate: 0.5 })
-        const lstm = tf.layers.bidirectional({
-            layer: tf.layers.lstm({ units: this.UNIT, returnSequences: false })
-        })
         const sigmoid = tf.layers.dense({ units: Object.keys(this.TYPE).length, activation: 'sigmoid' })
-        return tf.sequential({ layers: [mask, drop, lstm, sigmoid] })
+        return tf.sequential({ layers: [mask, lstm, drop, sigmoid] })
     }
 
     // scale highlight
     scale(xs) {
         // rank by distance desc
         console.log('==========================highlight scale padding==========================')
+
         console.log('Scaling...', SCALE)
         return xs.map(x =>
             x.map(v =>
@@ -36,7 +35,7 @@ class BiLSTMHighScale extends MyModel {
     }
 }
 
-const nn = new BiLSTMHighScale('mymodel-bilstm-high-scaleX4')
+const nn = new BiLSTMHighScale16('use-high-bilstm-x16')
 
 if (process.argv[2] == 'train') nn.train(process.argv[3], process.argv[4], process.argv[5], process.argv[6])
 if (process.argv[2] == 'evaluate') nn.evaluate(process.argv[3], process.argv[4], process.argv[5])

@@ -1,22 +1,21 @@
 /*
- * CNN highlight
+ * BiLSTM + intent highlight scale
  * @Author: Youwei Huang
  * @Email: devilyouwei@foxmail.com
  */
 
 const MyModelSmartBert = require('./base-model/mymodel-smartbert')
-const { load } = require('./modules/highlight')
+const { load } = require('../modules/highlight')
 const kmeans = load()
-const MULT = 2
-const DIST = 0.015
 const PAD = 0.0
 const DIM = 768
-const PAD_FUN = 256
+const DIST = 0.015
+const MULT = 10
 
-class SmartBertHighCNN extends MyModelSmartBert {
+class SmartBertHighLSTM extends MyModelSmartBert {
     padding(xs) {
-        // scale first
-        console.log('Scaling...', MULT)
+        // rank first
+        console.log('Scaling...')
         xs = xs.map(x =>
             x.map(v =>
                 kmeans.predict(this.tf.tensor(v)).distance.arraySync()[0] >= DIST
@@ -24,16 +23,21 @@ class SmartBertHighCNN extends MyModelSmartBert {
                     : v
             )
         )
-        console.log('Padding...', PAD)
         // padding
+        console.log('Finding max length...')
+        const maxLength = Math.max.apply(
+            Math,
+            xs.map(x => x.length)
+        )
+        console.log('Padding...', maxLength)
         return xs.map(x => {
-            while (x.length < PAD_FUN) x.push(Array(DIM).fill(PAD))
-            return x.slice(0, PAD_FUN)
+            while (x.length < maxLength) x.push(new Array(DIM).fill(PAD))
+            return x
         })
     }
 }
 
-const nn = new SmartBertHighCNN('smartbert_high_cnn')
+const nn = new SmartBertHighLSTM('smartbert_high_lstm')
 
 if (process.argv[2] == 'evaluate') nn.evaluate(process.argv[3], process.argv[4], process.argv[5])
 if (process.argv[2] == 'predict') nn.predict(process.argv[3], process.argv[4])

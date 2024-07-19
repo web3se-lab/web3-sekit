@@ -5,7 +5,7 @@
  * 2022-8-23
  */
 
-const MyModel = require('./my-model/mymodel')
+const MyModel = require('../my-model/mymodel')
 const PAD_FUN = 128
 const PAD_TKN = 512
 const PAD = 1

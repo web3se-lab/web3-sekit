@@ -112,14 +112,20 @@ dist
 
 docker/mysql/
 
-tf/models/*
-!tf/models/.gitkeep
+tf/models/universal-sentence-encoder
+tf/models/v0/*
+!tf/models/v0/.gitkeep
+tf/models/v1/*
+!tf/models/v1/.gitkeep
+tf/models/v2/*
+!tf/models/v2/.gitkeep
 
-tf/logs/*
-!tf/logs/.gitkeep
-
-tf/evaluates/*
-!tf/evaluates/.gitkeep
+tf/evaluates/v0/*
+!tf/evaluates/v0/.gitkeep
+tf/evaluates/v1/*
+!tf/evaluates/v1/.gitkeep
+tf/evaluates/v2/*
+!tf/evaluates/v2/.gitkeep
 
 static/contract/*
 !static/contract/.gitkeep

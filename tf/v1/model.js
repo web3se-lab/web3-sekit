@@ -18,6 +18,7 @@ const BATCH_SIZE = 50
 const BATCH = 200
 const START = 20000
 const EPOCH = 50
+const DIST = 0.21 // highlight within distance bound
 
 module.exports = class MyModel {
     /**
@@ -27,14 +28,15 @@ module.exports = class MyModel {
      */
     constructor(name) {
         this.name = name
-        this.modelPath = `file://${ROOT}/tf/models/${name}`
-        this.logPath = `${ROOT}/tf/logs/${name}`
+        this.modelPath = `file://${ROOT}/tf/models/v1/${name}`
+        this.evaluatePath = `${ROOT}/tf/evaluates/v1/${name}.json`
         this.tf = $.tf
         this.TYPE = $.TYPE
         this.UNIT = UNIT
         this.PAD = PAD
         this.DIM = DIM
         this.SEQ = SEQ
+        this.DIST = DIST
     }
 
     /**
@@ -75,7 +77,7 @@ module.exports = class MyModel {
             console.log('========================= Load My Model ==========================')
             console.log('Model', this.name)
             console.log('Path', this.modelPath)
-            console.log('Log', this.logPath)
+            console.log('Evaluate', this.evaluatePath)
             console.log('Load mymodel...')
             if (!this.mymodel) this.mymodel = await this.tf.loadLayersModel(`${this.modelPath}/model.json`)
             console.log('========================= Load My Model ==========================')
@@ -109,7 +111,7 @@ module.exports = class MyModel {
     }
 
     // train model
-    async train(bs = BATCH_SIZE, batch = BATCH, epoch = EPOCH, id = 455) {
+    async train(bs = BATCH_SIZE, batch = BATCH, epoch = EPOCH, id = 1) {
         console.log('Training================================>')
 
         bs = parseInt(bs)
@@ -126,7 +128,6 @@ module.exports = class MyModel {
         let count = 0
         let xs = []
         let ys = []
-        const callbacks = [this.tf.node.tensorBoard(this.logPath)]
 
         try {
             await this.loadModel()
@@ -144,12 +145,7 @@ module.exports = class MyModel {
                         console.log(tx)
                         const ty = this.tf.tensor(ys)
                         console.log(ty)
-                        await this.mymodel.fit(tx, ty, {
-                            batchSize: bs,
-                            shuffle: true,
-                            epochs: epoch,
-                            callbacks: callbacks
-                        })
+                        await this.mymodel.fit(tx, ty, { batchSize: bs, shuffle: true, epochs: epoch })
                         tx.dispose()
                         ty.dispose()
                         xs = []
@@ -236,10 +232,9 @@ module.exports = class MyModel {
                 id++
             }
 
-            const path = `${this.logPath}/evaluate.json`
-            fs.writeFileSync(path, JSON.stringify(evas))
+            fs.writeFileSync(this.evaluatePath, JSON.stringify(evas))
             console.log(eva)
-            console.log('Save to', path)
+            console.log('Save to', this.evaluatePath)
         } catch (e) {
             console.error(e)
         } finally {

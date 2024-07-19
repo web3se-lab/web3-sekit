@@ -8,14 +8,15 @@ const kmeans = load()
 
 const SCALE = 2
 
-class LSTMHighScale extends MyModel {
+class LSTMHighScale2 extends MyModel {
     // build my model structure
     buildModel() {
         const tf = this.tf
         const mask = tf.layers.masking({ maskValue: this.PAD, inputShape: [this.SEQ, this.DIM] })
         const lstm = tf.layers.lstm({ units: this.UNIT, returnSequences: false })
+        const drop = tf.layers.dropout({ rate: 0.5 })
         const sigmoid = tf.layers.dense({ units: Object.keys(this.TYPE).length, activation: 'sigmoid' })
-        return tf.sequential({ layers: [mask, lstm, sigmoid] })
+        return tf.sequential({ layers: [mask, lstm, drop, sigmoid] })
     }
 
     // scale highlight
@@ -33,7 +34,7 @@ class LSTMHighScale extends MyModel {
     }
 }
 
-const nn = new LSTMHighScale('mymodel-lstm-high-scaleX2')
+const nn = new LSTMHighScale2('use-high-lstm-x2')
 
 if (process.argv[2] == 'train') nn.train(process.argv[3], process.argv[4], process.argv[5], process.argv[6])
 if (process.argv[2] == 'evaluate') nn.evaluate(process.argv[3], process.argv[4], process.argv[5])

@@ -80,10 +80,6 @@ async function evaluate(req, res, next) {
             data.push({ title: 'USE + LSTM', data: `v${version}/lstm.json` })
             data.push({ title: 'USE + BiLSTM', data: `v${version}/bilstm.json` })
             data.push({ title: 'USE + BiLSTM + Highlight (ScaleX2)', data: `v${version}/bilstm_scaleX2.json` })
-            data.push({
-                title: 'USE + BiLSTM + Highlight (ScaleX2, Dropout)',
-                data: `v${version}/bilstm_scaleX2_dropout.json`
-            })
             data.push({ title: 'USE + BiLSTM + Highlight (ScaleX4)', data: `v${version}/bilstm_scaleX4.json` })
             data.push({ title: 'USE + BiLSTM + Highlight (ScaleX10)', data: `v${version}/bilstm_scaleX10.json` })
         } else if (version === 2) {
