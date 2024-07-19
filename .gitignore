@@ -113,6 +113,7 @@ dist
 docker/mysql/
 
 tf/models/universal-sentence-encoder
+tf/models/kmeans-model.json
 tf/models/v0/*
 !tf/models/v0/.gitkeep
 tf/models/v1/*

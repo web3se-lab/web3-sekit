@@ -33,5 +33,6 @@ module.exports = function load(path = PATH) {
         console.log('ERROR================================')
         console.log('K-means model not found, train first!')
         console.log('ERROR================================')
+        throw e
     }
 }

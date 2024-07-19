@@ -109,11 +109,11 @@ Ground truth label distribution for Vulnerability data:
 
 🤖 Acces **SmartIntentNN V1.0** models: <https://gitlab.com/web3se/smartintent/-/releases>
 
-To use our models, download the models, then copy/move them to `/tf/models/`.
+Download the models, then copy/move them to `/tf/models/v1/`.
 
 -   For **Universal Sentence Encoder**, download from: <https://tfhub.dev/google/universal-sentence-encoder/4>, move it to `/tf/models/` and rename the dir as `universal-sentence-encoder`. ⬇️
 -   For intent highlight **K-means model**, move it to `/tf/models/kmeans-model.json`.
--   For **mymodel-\*.zip**, unzip them and then move to the directories of corresponding filename, e.g., `mymodel-bilstm.zip` corresponds to `/tf/models/mymodel-bilstm/`.
+-   For **mymodel-\*.zip**, unzip them and then move to the directories of corresponding filename, e.g., `use-lstm.zip` corresponds to `/tf/models/v1/use-lstm/`.
 
 The structure of directory should be like the following figure:
 

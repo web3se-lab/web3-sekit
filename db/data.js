@@ -62,6 +62,7 @@ async function getSourceCodeScam(key) {
 
     return { sourceCode, risk, type, address, codeTree }
 }
+
 async function getSourceCodeVulnerability(key) {
     const res = await VulnerabilityHasContract(key, ['Id', 'Vulnerability'], ['SourceCode', 'Embedding'])
     if (!res) return null
