@@ -11,6 +11,7 @@ const $ = require('../utils')
 const { TokenHasContract } = require('../../db/data')
 
 const PAD_TKN = 512
+const SEQ = 256 // seq num limit for lstm (max number of functions)
 const PAD = 1
 
 module.exports = class MyModel {
@@ -21,37 +22,18 @@ module.exports = class MyModel {
      */
     constructor(name) {
         this.name = name
-        this.modelPath = `file://${ROOT}/tf/models/${name}/model.json` // python models
-        this.evaluatePath = `${ROOT}/tf/evaluates/${name}.json` // evaluate path
-        this.logPath = `${ROOT}/tf/logs/${name}`
+        this.modelPath = `file://${ROOT}/tf/models/v0/${name}/model.json` // python models
+        this.evaluatePath = `${ROOT}/tf/evaluates/v0/${name}.json` // evaluate path
         this.tf = $.tf
         this.TYPE = $.TYPE
-        this.UNIT = $.UNIT
-        this.MASK = $.MASK
-        this.FUNS = $.FUNS
-        this.MULT = $.MULT
-        this.DIST = $.DIST
-        this.INPUT = $.INPUT
     }
 
-    /**
-     * TODO build a model, need to complete when extended
-     * @method buildModel
-     * @return {any} a tensorflow model
-     */
-    buildModel() {}
-
-    // handle input-ready xs, lstm need padding
+    // padding to [256, 512]
     padding(xs) {
-        // finding max length batch
-        const maxLength = Math.max.apply(
-            Math,
-            xs.map(x => x.length)
-        )
         return xs.map(x => {
-            while (x.length < maxLength) x.push(Array(PAD_TKN).fill(PAD))
-            return x
-        }) // return a matrix [batchSize, words, wordDim]
+            while (x.length < SEQ) x.push(Array(PAD_TKN).fill(PAD))
+            return x.slice(0, SEQ)
+        })
     }
 
     // Need to change with model, this is for lstm/bilstm model example
@@ -78,7 +60,6 @@ module.exports = class MyModel {
     async loadModel() {
         console.log('Model Name', this.name)
         console.log('Model Path', this.modelPath)
-        console.log('Model Logs', this.logPath)
         console.log('Now Loading my model...from python convert tfjs')
         return (this.model = await this.tf.loadLayersModel(this.modelPath))
     }
@@ -90,74 +71,6 @@ module.exports = class MyModel {
             loss: 'binaryCrossentropy',
             metrics: ['accuracy']
         })
-    }
-
-    // train model
-    async train(bs = 500, batch = 20, epoch = 30, id = 1) {
-        console.log('Training================================>')
-
-        bs = parseInt(bs)
-        batch = parseInt(batch)
-        epoch = parseInt(epoch)
-        id = parseInt(id)
-
-        console.log('Total', bs * batch)
-        console.log('Batch', batch)
-        console.log('Epoch', epoch)
-        console.log('From', id)
-
-        let count = 0
-        let xs = []
-        let ys = []
-        const callbacks = [this.tf.node.tensorBoard(this.logPath)]
-
-        try {
-            await this.loadModel()
-            this.compile() // training needs to compile
-
-            while (count < bs * batch) {
-                const res = await TokenHasContract(id, ['Id', 'Scams'], ['TokenIds', 'ContractAddress'])
-                console.log('Token Id', id)
-                id++
-                if (!res) continue
-
-                console.log('Address', res.contract.ContractAddress)
-                const x = this.preX(res.contract.TokenIds)
-                const y = this.preY(res.Scams)
-                if (x && y) {
-                    xs.push(x)
-                    ys.push(y)
-                    if (xs.length === batch) {
-                        const tx = this.tf.tensor(this.padding(xs))
-                        console.log(tx)
-                        tx.print()
-                        const ty = this.tf.tensor(ys)
-                        ty.print()
-                        await this.mymodel.fit(tx, ty, {
-                            batchSize: batch,
-                            shuffle: true,
-                            epochs: epoch,
-                            callbacks: callbacks
-                        })
-                        tx.dispose()
-                        ty.dispose()
-                        xs = []
-                        ys = []
-                        await this.model.save(this.modelPath)
-                    }
-                    count++
-                    console.log('count', count)
-                    console.log('Id', id)
-                    console.log('Address', res.contract.ContractAddress)
-                }
-            }
-        } catch (e) {
-            console.error(e)
-            console.log('id', id)
-            console.log('count', count)
-        } finally {
-            if (this.model) this.model.dispose()
-        }
     }
 
     // change to Accuracy, Precision and Recall evaluate

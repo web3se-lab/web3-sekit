@@ -77,11 +77,11 @@ async function evaluate(req, res, next) {
             data.push({ title: 'CNN', data: `v${version}/cnn.json` })
         } else if (version === 1) {
             // SmartIntentNN V1
-            data.push({ title: 'USE + LSTM', data: `v${version}/lstm.json` })
-            data.push({ title: 'USE + BiLSTM', data: `v${version}/bilstm.json` })
-            data.push({ title: 'USE + BiLSTM + Highlight (ScaleX2)', data: `v${version}/bilstm_scaleX2.json` })
-            data.push({ title: 'USE + BiLSTM + Highlight (ScaleX4)', data: `v${version}/bilstm_scaleX4.json` })
-            data.push({ title: 'USE + BiLSTM + Highlight (ScaleX10)', data: `v${version}/bilstm_scaleX10.json` })
+            data.push({ title: 'USE + LSTM', data: `v${version}/use-lstm.json` })
+            data.push({ title: 'USE + BiLSTM', data: `v${version}/use-bilstm.json` })
+            data.push({ title: 'USE + BiLSTM + Highlight (X2)', data: `v${version}/use-high-bilstm-x2.json` })
+            data.push({ title: 'USE + BiLSTM + Highlight (X4)', data: `v${version}/use-high-bilstm-x4.json` })
+            data.push({ title: 'USE + BiLSTM + Highlight (X16)', data: `v${version}/use-high-bilstm-x16.json` })
         } else if (version === 2) {
             // SmartIntentNN V2
             data.push({ title: 'SmartBERT + Dense', data: `v${version}/smartbert_dense.json` })

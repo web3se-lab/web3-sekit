@@ -22,11 +22,11 @@ To try our demos online, please visit the following website:
 
 **Task:** Learn representations from smart contracts and provide a service for smart contract embedding.
 
-**Link:** <https://github.com/decentralizedlab/SmartBERT>
+**Link:** <https://github.com/web3se-lab/SmartBERT>
 
 ![SmartBERT API](./imgs/smartbert.png)
 
-Technical Points:
+**Technical Points:**
 
 -   Convert smart contract code context to vectors.
 -   Built with BERT/Roberta-based pre-training models.
@@ -43,15 +43,15 @@ Technical Points:
 
 ![SmartIntentNN Example](./imgs/example.png)
 
-Technical Guide:
+**Technical Guide:**
 
--   ⚙️ Frontend repository: <https://github.com/decentralizedlab/web3-sekit-vue>
+-   ⚙️ Frontend repository: <https://github.com/web3se-lab/web3-sekit-vue>
 -   📱 Pages for testing the model online: [Home](https://web3.cas-ll.cn/), [Highlight](https://web3.cas-ll.cn/highlight/), [Evaluation](https://web3.cas-ll.cn/evaluate/)
 -   🕵️ Click "Detect My Smart Contract" to copy and detect your customized smart contract.
 -   🚀 Click "Predict 🚀" to detect the malicious intents in smart contracts.
 -   🌲 Click "CCTree 🌲" to view the smart contract code tree.
 
-Technical Points:
+**Technical Points:**
 
 -   SmartIntentNN V1.0 employs a **Universal Sentence Encoder** to generate smart contract embeddings.
 -   The intent highlight model is trained using **K-means clustering**.
@@ -65,7 +65,7 @@ Technical Points:
 The above URL provides a `GET/POST JSON` API.
 You can query data by changing the parameter `key` in the URL.
 
-### Dataset of Smart Contract Intent
+### Smart Contract Intent
 
 <https://api.smart.cas-ll.cn/data/intent?key=1>
 
@@ -86,7 +86,7 @@ Ground truth label distribution for Intent data:
 | Rebase         | Adjusts token supply algorithmically to control price.                                                           | 659   |
 | MaxSell        | Limits specified users' selling times or amounts to lock liquidity.                                              | 68    |
 
-### Dataset of Smart Contract Vulnerability
+### Smart Contract Vulnerability
 
 <https://api.smart.cas-ll.cn/data/vulnerability?key=1>
 
@@ -126,9 +126,24 @@ How to run these models in Tensorflow.js?
 -   To train: `node tf/v1/use-high-bilstm-x2.js train`
 -   To summary: `node tf/v1/use-high-bilstm-x2.js summary`
 
+### Training & Evaluating Settings
+
+See settings in `/tf/v1/model.js`.
+
+**Training**
+
+Scope: 1, 10000
+Batch: 200
+Batch Size: 50
+Epoch: 50
+
+**Evaluating**
+
+Scope: 20000, 10000
+
 ## Install
 
-Before using the program, you need to install **nodejs** and **npm** tools first, then you install dependencies.
+Before using this program, you will need to install **nodejs** and **npm** tools first, then you install dependencies.
 
 Our recommended version is Node.js v16+.
 
