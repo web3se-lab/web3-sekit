@@ -28,9 +28,9 @@ To try our demos online, please visit the following website:
 
 **Technical Points:**
 
--   Convert smart contract code context to vectors.
--   Built with BERT/Roberta-based pre-training models.
--   MLM-trained on 40,000+ real smart contracts.
+-   Convert **smart contract** code context to vectors.
+-   Built with **BERT/Roberta**-based pre-training models.
+-   MLM-trained on **40,000+** real smart contracts.
 -   Serving APIs: [tokenize](http://api.smart.cas-ll.cn/smartbert/tokenize), [embed](http://api.smart.cas-ll.cn/smartbert/embed), [code tree](http://api.smart.cas-ll.cn/smartbert/tree).
 
 ### Project-2: SmartIntentNN
@@ -53,6 +53,7 @@ To try our demos online, please visit the following website:
 
 **Technical Points:**
 
+-   SmartIntentNN V1.0 is trained and evaluated on **Tensorflow.js**.
 -   SmartIntentNN V1.0 employs a **Universal Sentence Encoder** to generate smart contract embeddings.
 -   The intent highlight model is trained using **K-means clustering**.
 -   SmartIntentNN V2.0 will integrate **SmartBERT** to embed smart contracts.
@@ -135,7 +136,7 @@ See settings in `/tf/v1/model.js`.
 Scope: 1, 10000
 Batch: 200
 Batch Size: 50
-Epoch: 50
+Epoch: 100
 
 **Evaluating**
 

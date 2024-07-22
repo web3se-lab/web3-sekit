@@ -10,7 +10,7 @@ const ROOT = require('app-root-path')
 const $ = require('../utils')
 const $data = require('../../db/data')
 
-const UNIT = 32 // LSTM unit num for 1 layer
+const UNIT = 64 // LSTM unit num for 1 layer
 const PAD = 0.0 // pad
 const DIM = 512 // dimension for sentence embedding
 const SEQ = 256 // seq num limit for lstm (max number of functions)
