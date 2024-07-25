@@ -6,9 +6,9 @@
  * modified to use python trained model
  */
 
-const MyModelSmartBert = require('../my-model/mymodel-smartbert')
+const Model = require('./model')
 
-const nn = new MyModelSmartBert('smartbert_bilstm')
+const nn = new Model('smartbert_bilstm')
 
 if (process.argv[2] == 'evaluate') nn.evaluate(process.argv[3], process.argv[4], process.argv[5])
 if (process.argv[2] == 'predict') nn.predict(process.argv[3], process.argv[4])

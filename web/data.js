@@ -79,6 +79,7 @@ async function evaluate(req, res, next) {
             // SmartIntentNN V1
             data.push({ title: 'USE + LSTM', data: `v${version}/use-lstm.json` })
             data.push({ title: 'USE + BiLSTM', data: `v${version}/use-bilstm.json` })
+            data.push({ title: 'USE + LSTM + Highlight (X2)', data: `v${version}/use-high-lstm-x2.json` })
             data.push({ title: 'USE + BiLSTM + Highlight (X2)', data: `v${version}/use-high-bilstm-x2.json` })
             data.push({ title: 'USE + BiLSTM + Highlight (X4)', data: `v${version}/use-high-bilstm-x4.json` })
             data.push({ title: 'USE + BiLSTM + Highlight (X16)', data: `v${version}/use-high-bilstm-x16.json` })
