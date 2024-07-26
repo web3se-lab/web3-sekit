@@ -6,9 +6,9 @@ const MyModel = require('./model')
 const load = require('./highlight')
 const kmeans = load()
 
-const SCALE = 2
+const SCALE = 16
 
-class LSTMHighScale2 extends MyModel {
+class LSTMHighScale16 extends MyModel {
     // build my model structure
     buildModel() {
         const tf = this.tf
@@ -34,7 +34,7 @@ class LSTMHighScale2 extends MyModel {
     }
 }
 
-const nn = new LSTMHighScale2('use-high-lstm-x2')
+const nn = new LSTMHighScale16('use-high-lstm-x16')
 
 if (process.argv[2] == 'train') nn.train(process.argv[3], process.argv[4], process.argv[5], process.argv[6])
 if (process.argv[2] == 'evaluate') nn.evaluate(process.argv[3], process.argv[4], process.argv[5])
