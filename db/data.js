@@ -20,7 +20,7 @@ async function VulnerabilityHasContract(id, tokenAttr, contractAttr) {
         include: [{ model: Contract, attributes: contractAttr }]
     }
 
-    options.where = { ContractId: parseInt(id) }
+    options.where = { Id: parseInt(id) }
     Vulnerability.hasOne(Contract, { sourceKey: 'ContractId', foreignKey: 'Id' })
     return await Vulnerability.findOne(options)
 }

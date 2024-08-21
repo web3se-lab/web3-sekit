@@ -19,7 +19,7 @@
         "scamsniper": "node ./src/scamsniper.js",
         "safu": "node ./src/safu.js",
         "tokenizer": "node ./tensorflow/tokenizer.js",
-        "dev": "pm2-dev start ./web/app.js",
+        "dev": "nodemon ./web/app.js",
         "restart": "pm2 restart ./web/app.js",
         "start": "pm2 start ./web/app.js",
         "stop": "pm2 stop ./web/app.js",
@@ -66,6 +66,7 @@
         "eslint": "^8.33.0",
         "eslint-config-prettier": "^8.6.0",
         "eslint-plugin-prettier": "^4.2.1",
+        "nodemon": "^3.1.4",
         "npm-check-updates": "^16.6.3",
         "prettier": "^2.8.3"
     },

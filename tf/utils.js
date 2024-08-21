@@ -20,7 +20,7 @@ const VOC = 50000 // total vocab
 module.exports = {
     // get embeddings from python API
     // method = method = 'embedding' | 'embeddingAvg' | 'embeddingMax'
-    async embedAPI(text, method = 'embeddingAvg') {
+    async embedAPI(text, method = 'embedding-avg') {
         const url = `${process.env.EMBED_API}/${method}`
         const form = new FormData()
         form.append('text', text)

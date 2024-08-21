@@ -32,9 +32,7 @@ async function embedding(req, res, next) {
     try {
         const text = req.body.text
         const type = req.body.type || 'solidity'
-        res.json({
-            Embedding: await embed($.getCodeMap($.clearCode($.multiContracts(text), type), type))
-        })
+        res.json({ Embedding: await embed($.getCodeMap($.clearCode($.multiContracts(text), type), type)) })
     } catch (e) {
         next(e)
     }

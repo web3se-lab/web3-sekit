@@ -170,38 +170,15 @@ async function embedAllAvg(start = 1, end) {
     for (let i = start; i <= max; i++) {
         const code = await $contract.getCodeMapById(i)
         if (!code) continue
+        console.log('code', code)
         console.log('Embed Avg', i)
         const json = {}
         for (const i in code) {
             json[i] = {}
-            for (const j in code[i]) json[i][j] = await embedAPI(removeBr(code[i][j]), 'embeddingAvg')
+            for (const j in code[i]) json[i][j] = await embedAPI(removeBr(code[i][j]), 'embedding-avg')
         }
         console.log(json)
-        const data = {
-            Id: i,
-            Embedding: JSON.stringify(json)
-        }
-        await $contract.upsert(data)
-    }
-}
-
-// embed all: max pool embedding
-async function embedAllMax(start = 1, end) {
-    const max = end || (await $contract.maxId())
-    for (let i = start; i <= max; i++) {
-        const code = await $contract.getCodeMapById(i)
-        if (!code) continue
-        console.log('Embed Max', i)
-        const json = {}
-        for (const i in code) {
-            json[i] = {}
-            for (const j in code[i]) json[i][j] = await embedAPI(removeBr(code[i][j]), 'embeddingMax')
-        }
-        console.log(json)
-        const data = {
-            Id: i,
-            EmbeddingMax: JSON.stringify(json)
-        }
+        const data = { Id: i, Embedding: JSON.stringify(json) }
         await $contract.upsert(data)
     }
 }
@@ -214,7 +191,6 @@ if (process.argv[1].includes('src/contract')) {
     else if (process.argv[2] == 'labelToken') labelToken(process.argv[3], process.argv[4])
     else if (process.argv[2] == 'removeNull') $contract.removeNull()
     else if (process.argv[2] == 'vyper') getVyper()
-    else if (process.argv[2] == 'embed-all-avg') embedAllAvg(process.argv[3], process.argv[4])
-    else if (process.argv[2] == 'embed-all-max') embedAllMax(process.argv[3], process.argv[4])
+    else if (process.argv[2] == 'embed-all') embedAllAvg(process.argv[3], process.argv[4])
     else if (process.argv[2] == 'tokenize-all') tokenAll(process.argv[3], process.argv[4])
 }
