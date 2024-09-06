@@ -6,12 +6,21 @@ const StealthPlugin = require('puppeteer-extra-plugin-stealth')
 puppeteer.use(StealthPlugin())
 const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker')
 puppeteer.use(AdblockerPlugin({ blockTrackers: true }))
+const fetch = require('node-fetch')
+const querystring = require('querystring')
 
 const utils = {
-    async get(url, params = {}, config = {}) {
-        console.log(url)
-        const res = await axios.get(url, { params, config })
-        return res.data
+    async get(url, params = {}, headers = {}) {
+        console.log('url', url)
+        console.log('params', params)
+        const queryString = querystring.stringify(params)
+        const fullUrl = queryString ? `${url}?${queryString}` : url
+        const response = await fetch(fullUrl, { headers })
+
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
+
+        const data = await response.json()
+        return data
     },
     async post(url, query = {}, config = {}) {
         console.log(url)

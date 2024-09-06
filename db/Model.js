@@ -68,7 +68,11 @@ module.exports = {
         table: {
             Id: { type: DataTypes.INTEGER(11), primaryKey: true, autoIncrement: true },
             ContractId: { type: DataTypes.INTEGER(11), unique: true },
-            Vulnerability: DataTypes.TEXT
+            Dir: DataTypes.STRING,
+            File: DataTypes.STRING,
+            Vulnerability: DataTypes.JSON,
+            Detail: DataTypes.TEXT,
+            Repair: DataTypes.TEXT
         },
         options: {
             charset: 'utf8mb4',
@@ -77,9 +81,35 @@ module.exports = {
                 {
                     name: 'vulnerability_type_index',
                     method: 'BTREE',
-                    fields: ['Vulnerability']
+                    fields: ['vulnerability']
                 }
             ]
         }
+    },
+    Wallet: {
+        name: 'wallet',
+        table: {
+            Id: { type: DataTypes.INTEGER(11), primaryKey: true, autoIncrement: true },
+            Address: { type: DataTypes.STRING, allowNull: false },
+            Network: { type: DataTypes.STRING, allowNull: false },
+            Balance: DataTypes.JSON,
+            Label: DataTypes.STRING
+        }
+    },
+    options: {
+        charset: 'utf8mb4',
+        collate: 'utf8mb4_general_ci',
+        indexes: [
+            {
+                name: 'unique_address_network',
+                unique: true,
+                fields: ['Address', 'Network']
+            },
+            {
+                name: 'label_index',
+                method: 'BTREE',
+                fields: ['Label']
+            }
+        ]
     }
 }
