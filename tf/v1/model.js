@@ -11,13 +11,13 @@ const $ = require('../utils')
 const $data = require('../../db/data')
 
 const UNIT = 64 // LSTM unit num for 1 layer
-const PAD = 0.0 // pad
+const PAD = 0.0 // pad zero vector
 const DIM = 512 // dimension for sentence embedding
 const SEQ = 256 // seq num limit for lstm (max number of functions)
 const BATCH_SIZE = 50
 const BATCH = 200
 const START = 20000
-const EPOCH = 50
+const EPOCH = 100
 const DIST = 0.21 // highlight within distance bound
 
 module.exports = class MyModel {
