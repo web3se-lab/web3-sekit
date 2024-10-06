@@ -1,221 +1,22 @@
-# Repair timestamp dependency
-## Detail
-The given vulnerability, **TP** (Timestamp Dependence), is found in the _TTPresale_ contract. The relevant code snippet and its brief explanation are as follows.
-
-### Code Snippet with Timestamp Dependence Vulnerability
+## Contract
 
 ```solidity
-uint64 public endDiscountTime = 0;
 
-function setDiscountTime(uint64 _endTime) external onlyAdmin {
-    require(_endTime > block.timestamp);
-    endDiscountTime = _endTime;
-}
+As a smart contract security expert, your task is to detect, locate, explain, and repair vulnerabilities in smart contracts.
 
-function _buyDiscountTTM(uint256 _value, uint256 _mgrId, address _gameWalletAddr, address _buyer) 
-    private  
-{
-    require(_gameWalletAddr != address(0));
-    if (_mgrId == 1) {
-        require(nextDiscountTTMTokenId1 <= 50, "This Manager is sold out");
-        if (block.timestamp <= endDiscountTime) {
-            require(_value == 0.64 ether);
-        } else {
-            require(_value == 0.99 ether);
-        }
-        nextDiscountTTMTokenId1 += 1;
-        ttmToken.safeGiveByContract(nextDiscountTTMTokenId1 - 1, _gameWalletAddr);
-        emit ManagerSold(_buyer, _gameWalletAddr, 1, nextDiscountTTMTokenId1);
-    } else if (_mgrId == 6) {
-        require(nextDiscountTTMTokenId6 <= 390, "This Manager is sold out");
-        if (block.timestamp <= endDiscountTime) {
-            require(_value == 0.97 ether);
-        } else {
-            require(_value == 1.49 ether);
-        }
-        nextDiscountTTMTokenId6 += 1;
-        ttmToken.safeGiveByContract(nextDiscountTTMTokenId6 - 1, _gameWalletAddr);
-        emit ManagerSold(_buyer, _gameWalletAddr, 6, nextDiscountTTMTokenId6);
-    } else {
-        require(false);
-    }
-}
+A smart contract may have one or more of the following vulnerabilities:
+- Timestamp Dependency (TP)
+- Reentrancy (RE)
+- Integer Overflow/Underflow (IO)
+- Dangerous delegatecall (DE)
 
-function _buyDiscountTTW(uint256 _value, uint256 _wonderId, address _gameWalletAddr, address _buyer) 
-    private 
-{
-    require(_gameWalletAddr != address(0));
-    require(_wonderId == 1); 
+To effectively address and fix all vulnerabilities, follow this three-step instructions:
+1. **Detect**: Check for any vulnerabilities based on provided criteria and categorize them.
+2. **Locate**: Pinpoint the exact location of the vulnerabilities in the code, include the vulnerable code snippet, and briefly explain the issue.
+3. **Repair**: Fix the identified vulnerabilities and provide the corrected code.
 
-    require(nextDiscountTTWTokenId1 <= 30, "This Manager is sold out");
-    if (block.timestamp <= endDiscountTime) {
-        require(_value == 0.585 ether);
-    } else {
-        require(_value == 0.90 ether);
-    }
-    nextDiscountTTWTokenId1 += 1;
-    ttwToken.safeGiveByContract(nextDiscountTTWTokenId1 - 1, _gameWalletAddr);
-    emit WonderSold(_buyer, _gameWalletAddr, 1, nextDiscountTTWTokenId1);
-}
-```
 
-### Explanation
-
-The timestamp dependence vulnerability arises from the use of `block.timestamp` in conditional statements that control critical operations. 
-
-1. **Function _setDiscountTime_**:
-   - This function sets the `endDiscountTime` to a future timestamp based on the current `block.timestamp`. This is not inherently problematic but can become an issue when combined with other conditional checks based on timestamp.
-
-   ```solidity
-   function setDiscountTime(uint64 _endTime) external onlyAdmin {
-       require(_endTime > block.timestamp);
-       endDiscountTime = _endTime;
-   }
-   ```
-
-2. **Function _buyDiscountTTM_**:
-   - In this function, the `block.timestamp` is used to determine the value that is required to buy tokens at a discount. If the current timestamp is before `endDiscountTime`, a discounted price is effective. Otherwise, a higher price is required.
-   
-   ```solidity
-   function _buyDiscountTTM(uint256 _value, uint256 _mgrId, address _gameWalletAddr, address _buyer) 
-       private  
-   {
-       if (block.timestamp <= endDiscountTime) {
-           require(_value == 0.64 ether);
-       } else {
-           require(_value == 0.99 ether);
-       }
-       // Additional Logic
-   }
-   ```
-
-3. **Function _buyDiscountTTW_**:
-   - Similarly, this function checks the `block.timestamp` to decide the price of the Wonder tokens. If the current timestamp is before `endDiscountTime`, a discounted price applies; otherwise, a higher price is charged.
-   
-   ```solidity
-   function _buyDiscountTTW(uint256 _value, uint256 _wonderId, address _gameWalletAddr, address _buyer) 
-       private 
-   {
-       if (block.timestamp <= endDiscountTime) {
-           require(_value == 0.585 ether);
-       } else {
-           require(_value == 0.90 ether);
-       }
-       // Additional Logic
-   }
-   ```
-
-### Vulnerability Labeling
-
-Based on the instructions, these functions exhibit the timestamp dependence vulnerability since they:
-1. Use `block.timestamp` (`TDInvocation`).
-2. Assign or use `block.timestamp` in conditional statements to control critical logic such as pricing (`TDAssign` and `TDContaminate`).
-
-Thus, the functions `_buyDiscountTTM` and `_buyDiscountTTW` in the `TTPresale` contract should have the timestamp dependency vulnerability labeled, i.e., label = 1.
-
-## Repair
-To repair the timestamp dependency vulnerability in the provided function code snippets, I will use the **Set Buffer Time** method. This approach introduces a buffer time to minimize the risk of timestamp manipulation.
-
-### Fixed Functions with Set Buffer Time
-
-Here are the modified functions:
-
-#### Modified `_buyDiscountTTM` Function
-
-```solidity
-uint64 public endDiscountTime = 0;
-uint256 public bufferTime = 1 hours; // Adding a buffer time of 1 hour
-
-function setDiscountTime(uint64 _endTime) external onlyAdmin {
-    require(_endTime > block.timestamp + bufferTime, "End time must be greater than the current time with buffer");
-    endDiscountTime = _endTime;
-}
-
-function _buyDiscountTTM(uint256 _value, uint256 _mgrId, address _gameWalletAddr, address _buyer) 
-    private  
-{
-    require(_gameWalletAddr != address(0));
-    if (_mgrId == 1) {
-        require(nextDiscountTTMTokenId1 <= 50, "This Manager is sold out");
-        if (block.timestamp + bufferTime <= endDiscountTime) {
-            require(_value == 0.64 ether);
-        } else {
-            require(_value == 0.99 ether);
-        }
-        nextDiscountTTMTokenId1 += 1;
-        ttmToken.safeGiveByContract(nextDiscountTTMTokenId1 - 1, _gameWalletAddr);
-        emit ManagerSold(_buyer, _gameWalletAddr, 1, nextDiscountTTMTokenId1);
-    } else if (_mgrId == 6) {
-        require(nextDiscountTTMTokenId6 <= 390, "This Manager is sold out");
-        if (block.timestamp + bufferTime <= endDiscountTime) {
-            require(_value == 0.97 ether);
-        } else {
-            require(_value == 1.49 ether);
-        }
-        nextDiscountTTMTokenId6 += 1;
-        ttmToken.safeGiveByContract(nextDiscountTTMTokenId6 - 1, _gameWalletAddr);
-        emit ManagerSold(_buyer, _gameWalletAddr, 6, nextDiscountTTMTokenId6);
-    } else {
-        require(false);
-    }
-}
-```
-
-#### Modified `_buyDiscountTTW` Function
-
-```solidity
-function _buyDiscountTTW(uint256 _value, uint256 _wonderId, address _gameWalletAddr, address _buyer) 
-    private 
-{
-    require(_gameWalletAddr != address(0));
-    require(_wonderId == 1); 
-
-    require(nextDiscountTTWTokenId1 <= 30, "This Manager is sold out");
-    if (block.timestamp + bufferTime <= endDiscountTime) {
-        require(_value == 0.585 ether);
-    } else {
-        require(_value == 0.90 ether);
-    }
-    nextDiscountTTWTokenId1 += 1;
-    ttwToken.safeGiveByContract(nextDiscountTTWTokenId1 - 1, _gameWalletAddr);
-    emit WonderSold(_buyer, _gameWalletAddr, 1, nextDiscountTTWTokenId1);
-}
-```
-
-### Explanation
-
-The key changes made are:
-
-1. Introduced a `bufferTime` of 1 hour to provide a cushion around the current `block.timestamp`.
-   
-   ```solidity
-   uint256 public bufferTime = 1 hours; // Adding a buffer time of 1 hour
-   ```
-
-2. Adjusted the `setDiscountTime` function to ensure the provided end time is after the current timestamp plus the buffer time.
-   
-   ```solidity
-   function setDiscountTime(uint64 _endTime) external onlyAdmin {
-       require(_endTime > block.timestamp + bufferTime, "End time must be greater than the current time with buffer");
-       endDiscountTime = _endTime;
-   }
-   ```
-
-3. Incorporated the `bufferTime` into the conditional checks for the discount period in the `_buyDiscountTTM` and `_buyDiscountTTW` functions. This minimizes the effect of minor timestamp manipulations.
-
-   ```solidity
-   if (block.timestamp + bufferTime <= endDiscountTime) {
-       // Discount logic
-   } else {
-       // Non-discount logic
-   }
-   ```
-
-These changes mitigate the risk of timestamp manipulation while retaining the initial intention of checking discount periods based on time.
-
-# Contract
-
-```solidity
+Smart Contract:
  
  
 
@@ -681,4 +482,9 @@ contract TTPresale is AccessService {
         discountEnd = endDiscountTime;
     }
 }
+```
+## Vulnerability
+
+```json
+{"timestamp dependency":["TTPresale"]}
 ```

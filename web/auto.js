@@ -12,8 +12,8 @@ const CHAIN = require('../config/blockchain.json')
 
 const API = process.env.UNIAI_API
 const TOKEN = process.env.UNIAI_TOKEN
+const PROVIDER = process.env.PROVIDER
 const MODEL = process.env.MODEL
-const SUBMODEL = process.env.SUBMODEL
 
 async function config(_, res) {
     try {
@@ -62,10 +62,10 @@ async function generate(req, res) {
             `${API}/ai/chat-stream`,
             {
                 prompts: [{ role: 'user', content }],
-                chunk,
+                provider: PROVIDER,
                 model: MODEL,
-                subModel: SUBMODEL,
-                temperature: 0.85
+                stream: true,
+                temperature: 0
             },
             { responseType: 'stream', headers: { token: TOKEN } }
         )
@@ -114,7 +114,7 @@ async function check(req, res) {
         const content = `对以下智能合约代码进行检测：漏洞、恶意代码、命名规范、算法逻辑、语法、冗余代码\n如有问题，请给出优化建议，并给出优化方案\n待检测代码如下：\n${code}`
         const message = await $.post(
             `${API}/ai/chat-stream`,
-            { prompts: [{ role: 'user', content }], chunk, model: MODEL, subModel: SUBMODEL },
+            { prompts: [{ role: 'user', content }], chunk, provider: PROVIDER, model: MODEL },
             { responseType: 'stream', headers: { token: TOKEN } }
         )
 

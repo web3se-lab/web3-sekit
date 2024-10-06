@@ -16,40 +16,31 @@ const ai = new UniAI({ OpenAI: { key: OPENAI_KEY, proxy: OPENAI_API }, GLM: { lo
  */
 async function detect(id, provider = ChatModelProvider.GLM, model = ChatModel.GLM_9B) {
     const system = `
-    As a smart contract security expert, your task is to detect, locate, explain, and repair vulnerabilities in smart contracts.
-    
-    A smart contract may have one or more of the following vulnerabilities:
-    - Timestamp Dependency (TP)
-    - Reentrancy (RE)
-    - Integer Overflow/Underflow (IO)
-    - Dangerous delegatecall (DE)
-    
-    To effectively address all vulnerabilities, follow this three-step approach:
-    1. **Detection**: Check for any vulnerabilities based on provided criteria and categorize them.
-    2. **Identification**: Pinpoint the exact location of the vulnerabilities in the code, include the vulnerable code snippet, and briefly explain the issue.
-    3. **Repair**: Fix the identified vulnerabilities and provide the corrected code.
-    
-    Output in JSON format, including the following three fields:
-      1. vulnerabilities: An array of vulernabilities;
-      2. detail: The vulnerable code snippet and explanation of vunerabilities;
-      3. repair: fixed function code snippets.
-    
-    If no vulnerabilities are found, return: 
-    {
-        "vulnerabilities": [],
-        "detail": null,
-        "repair": null
-    }
-    `
+As a smart contract security expert, your task is to detect, locate, explain, and repair vulnerabilities in smart contracts.
+
+A smart contract may have one or more of the following vulnerabilities:
+- Timestamp Dependency (TP)
+- Reentrancy (RE)
+- Integer Overflow/Underflow (IO)
+- Dangerous delegatecall (DE)
+
+To effectively address and fix all vulnerabilities, follow this three-step instructions:
+1. **Detect**: Check for any vulnerabilities based on provided criteria and categorize them.
+2. **Locate**: Pinpoint the exact location of the vulnerabilities in the code, include the vulnerable code snippet, and briefly explain the issue.
+3. **Repair**: Fix the identified vulnerabilities and provide the corrected code.
+`
 
     const data = await $data.getSourceCodeVulnerability(id)
     if (!data) throw new Error('Not found')
 
-    const input = [{ role: ChatRoleEnum.SYSTEM, content: system }]
-    input.push({ role: ChatRoleEnum.USER, content: data.sourceCode })
+    const input = [
+        { role: ChatRoleEnum.SYSTEM, content: `${system}\nSmart Contract:\n${data.sourceCode}` },
+        { role: ChatRoleEnum.USER, content: `Detect the vulnerabilities in the smart contract` }
+    ]
 
-    const res = await ai.chat(input, { provider, model, top: 0 })
+    const res = await ai.chat(input, { provider, model })
     console.log(res)
+    console.log(data.vulnerability)
 
     return {
         vulId: data.vulId,
@@ -57,6 +48,37 @@ async function detect(id, provider = ChatModelProvider.GLM, model = ChatModel.GL
         contract: data.codeTree,
         result: $.extractJSON(res.content),
         truth: data.vulnerability
+    }
+}
+
+const map = {
+    // 'block number dependency': { TP: 0, TN: 0, FP: 0, FN: 0 },
+    // 'ether frozen': { TP: 0, TN: 0, FP: 0, FN: 0 },
+    // 'ether strict equality': { TP: 0, TN: 0, FP: 0, FN: 0 },
+    // 'unchecked external call': { TP: 0, TN: 0, FP: 0, FN: 0 }
+    'dangerous delegatecall': { TP: 0, TN: 0, FP: 0, FN: 0 },
+    'integer overflow': { TP: 0, TN: 0, FP: 0, FN: 0 },
+    reentrancy: { TP: 0, TN: 0, FP: 0, FN: 0 },
+    'timestamp dependency': { TP: 0, TN: 0, FP: 0, FN: 0 }
+}
+
+async function evaluate() {
+    const text = readFileSync(`${ROOT}/llm/data/dev.jsonl`, 'utf-8')
+    const json = JSON.parse(text)
+    for (const item of json) {
+        const [system, user, assitant] = item.messages
+        const res = await ai.chat([system, user], { provider: ChatModelProvider.GLM, model: ChatModel.GLM_9B })
+        const y1 = Object.keys(JSON.parse(res.content))
+        const y2 = Object.keys(JSON.parse(assitant.content))
+        console.log('predict', y1)
+        console.log('truth', y2)
+        for (const i in map) {
+            if (y1.includes(i) && y2.includes(i)) map[i].TP++
+            if (y1.includes(i) && !y2.includes(i)) map[i].FP++
+            if (!y1.includes(i) && y2.includes(i)) map[i].FN++
+            if (!y1.includes(i) && !y2.includes(i)) map[i].TN++
+        }
+        console.log(map)
     }
 }
 
@@ -70,82 +92,92 @@ A smart contract may have one or more of the following vulnerabilities:
 - Integer Overflow/Underflow (IO)
 - Dangerous delegatecall (DE)
 
-To effectively address all vulnerabilities, follow this three-step approach:
-1. **Detection**: Check for any vulnerabilities based on provided criteria and categorize them.
-2. **Identification**: Pinpoint the exact location of the vulnerabilities in the code, include the vulnerable code snippet, and briefly explain the issue.
+To effectively address and fix all vulnerabilities, follow this three-step instructions:
+1. **Detect**: Check for any vulnerabilities based on provided criteria and categorize them.
+2. **Locate**: Pinpoint the exact location of the vulnerabilities in the code, include the vulnerable code snippet, and briefly explain the issue.
 3. **Repair**: Fix the identified vulnerabilities and provide the corrected code.
 
-Output in JSON format, including the following three fields:
-  1. vulnerabilities: An array of vulernabilities;
-  2. detail: The vulnerable code snippet and explanation of vunerabilities;
-  3. repair: fixed function code snippets.
-
-If no vulnerabilities are found, return: 
-{
-    "vulnerabilities": [],
-    "detail": null,
-    "repair": null
-}
 `
 
-    const json = {}
-    for (let id = 1; id < 2600; id++) {
+    // structure train data set
+    const max = 4371
+    const json1 = {} // push vulnerable data
+    const json2 = {} // push empty data
+
+    for (let id = 1; id <= max; id++) {
         const data = await $data.getSourceCodeVulnerability(id)
         if (!data) continue
 
         const { vulnerability, detail, repair, dir } = data
-        let index = ''
-        if (dir === 'timestamp dependency') index = 'TP'
-        if (dir === 'reentrancy') index = 'RE'
-        if (dir === 'integer overflow') index = 'IO'
-        if (dir === 'dangerous delegatecall ') index = 'DE'
 
-        const output = { vulnerabilities: vulnerability ? Object.keys(vulnerability) : [], detail, repair }
+        if (!Object.keys(map).includes(dir)) continue
 
-        if (!json[index]) json[index] = []
-        // const result = await compData(data.sourceCode, JSON.stringify(output))
-        const messages = [
-            { role: ChatRoleEnum.SYSTEM, content: system },
-            { role: ChatRoleEnum.USER, content: data.sourceCode },
-            { role: ChatRoleEnum.ASSISTANT, content: JSON.stringify(output) }
-        ]
-        json[index].push({ messages })
+        if (vulnerability) {
+            if (!json1[dir]) json1[dir] = []
+            const messages = [
+                { role: ChatRoleEnum.SYSTEM, content: `${system}\nSmart Contract:\n${data.sourceCode}` },
+                { role: ChatRoleEnum.USER, content: `Detect the vulnerabilities in the smart contract` },
+                { role: ChatRoleEnum.ASSISTANT, content: JSON.stringify(vulnerability) }
+            ]
+            json1[dir].push({ messages })
+        } else {
+            if (!json2[dir]) json2[dir] = []
+            const messages = [
+                { role: ChatRoleEnum.SYSTEM, content: `${system}\nSmart Contract:\n${data.sourceCode}` },
+                { role: ChatRoleEnum.USER, content: `Detect the vulnerabilities in the smart contract` },
+                { role: ChatRoleEnum.ASSISTANT, content: JSON.stringify([]) }
+            ]
+            json2[dir].push({ messages })
+        }
     }
-    writeFileSync(`${ROOT}/llm/data/data.json`, JSON.stringify(json))
 
     // Split dataset to train adn evaluate
-    const trainData = []
-    const evalData = []
+    const train = []
+    const test = []
 
-    // Extract 80% of data for each key for training, and 20% for evaluation
-    for (const key in json) {
-        const dataList = json[key]
+    // Split 80% of data for each key for training, and 20% for evaluation
+    for (const key in json1) {
+        const dataList = json1[key]
+        const dataList2 = $.getRandomElements(json2[key], Math.floor(dataList.length * 0.3))
         const cutoff = Math.floor(dataList.length * 0.8)
-        trainData.push(...dataList.slice(0, cutoff))
-        evalData.push(...dataList.slice(cutoff))
+        const cutoff2 = Math.floor(dataList2.length * 0.8)
+        const slice1 = dataList.slice(0, cutoff).concat(dataList2.slice(0, cutoff2))
+        const slice2 = dataList.slice(cutoff).concat(dataList2.slice(cutoff2))
+
+        console.log(key)
+        console.log('total', dataList.length)
+        console.log('train', slice1.length)
+        console.log('test', slice2.length)
+        console.log('empty', dataList2.length)
+        console.log()
+        train.push(...slice1)
+        test.push(...slice2)
     }
 
+    // balance empty data, reserve 10 percent
+    const empty = JSON.stringify([])
+    console.log('Train data count', `${train.filter(v => v.messages[2].content === empty).length}/${train.length}`)
+    console.log('Test data count', `${test.filter(v => v.messages[2].content === empty).length}/${test.length}`)
+
     // Write the train and eval data to separate JSON files
-    writeFileSync(`${ROOT}/llm/data/train.json`, JSON.stringify(trainData))
-    writeFileSync(`${ROOT}/llm/data/dev.json`, JSON.stringify(evalData))
+    writeFileSync(`${ROOT}/llm/data/train.jsonl`, JSON.stringify(train))
+    writeFileSync(`${ROOT}/llm/data/dev.jsonl`, JSON.stringify(test))
 }
 
 async function markdown(file, index) {
-    const text = readFileSync(`${ROOT}/llm/data/${file}.json`, 'utf-8')
+    const text = readFileSync(`${ROOT}/llm/data/${file}.jsonl`, 'utf-8')
     const json = JSON.parse(text)
     const data = json[index]
-    const res = $.extractJSON(data.messages[2].content)
     let md = ``
-    md += `# Repair ${res.vulnerabilities}\n`
-    md += `## Detail\n${res.detail}\n\n`
-    md += `## Repair\n${res.repair}\n\n`
-    md += `# Contract\n\n\`\`\`solidity\n${data.messages[1].content}\n\`\`\``
+    md += `## Contract\n\n\`\`\`solidity\n${data.messages[0].content}\n\`\`\`\n`
+    md += `## Vulnerability\n\n\`\`\`json\n${data.messages[2].content}\n\`\`\`\n`
     writeFileSync(`${ROOT}/llm/md/${file}-${index}.md`, md)
 }
 
 if (process.argv[1].includes('llm/vul')) {
     // argv 2 is contract id
     if (process.argv[2] == 'detect') detect(process.argv[3])
+    if (process.argv[2] == 'evaluate') evaluate()
     if (process.argv[2] == 'json-data') jsonData()
     if (process.argv[2] == 'md-data') markdown(process.argv[3], process.argv[4])
 }

@@ -9,8 +9,7 @@ package-lock.json
 yarn.lock
 db/data.json
 db/data.txt
-db/resource
-db/resource2
+db/resource*
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
@@ -134,3 +133,6 @@ static/contract/*
 
 static/solc/*
 !static/solc/.gitkeep
+
+llm/data/*
+llm/md/*
