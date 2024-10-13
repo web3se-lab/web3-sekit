@@ -144,7 +144,7 @@ async function labelToken(start = 1, end) {
     }
 }
 
-// update smart contract token, tokenId
+/* update smart contract token, tokenId
 async function tokenAll(start = 1, end) {
     const max = end || (await $contract.maxId())
     for (let i = start; i <= max; i++) {
@@ -163,23 +163,44 @@ async function tokenAll(start = 1, end) {
         await $contract.upsert(data)
     }
 }
+*/
 
 // embed all: average pool embedding
 async function embedAllAvg(start = 1, end) {
     const max = end || (await $contract.maxId())
+    const BATCH = 20
+    let ps = [] // multi threads request
+    const pool = 'cls' // avg | max | cls | out
+
     for (let i = start; i <= max; i++) {
-        const code = await $contract.getCodeMapById(i)
-        if (!code) continue
-        console.log('code', code)
-        console.log('Embed Avg', i)
-        const json = {}
-        for (const i in code) {
-            json[i] = {}
-            for (const j in code[i]) json[i][j] = await embedAPI(removeBr(code[i][j]), 'embedding-avg')
+        ps.push(
+            $contract
+                .getCodeMapById(i)
+                .then(code => {
+                    if (!code) throw new Error(`Error: ID-${i} not found code`)
+
+                    console.log('Code Tree', code)
+                    console.log(`Embed Pool ${pool}`, i)
+                    const data = []
+                    for (const i in code) for (const j in code[i]) code[i][j] = data.push(code[i][j]) - 1
+                    return { code, promise: embedAPI(data, pool) }
+                })
+                .then(({ code, promise }) => promise.then(res => ({ code, res })))
+                .then(({ code, res }) => {
+                    for (const i in code) for (const j in code[i]) code[i][j] = res[code[i][j]]
+                    return $contract.updateById({ Id: i, Embedding: JSON.stringify(code) })
+                })
+                .then(console.log('Updated'))
+                .catch(e => {
+                    console.error(e)
+                    $contract.updateById({ Id: i, Embedding: null })
+                })
+        )
+
+        if (ps.length >= BATCH || i === max) {
+            await Promise.all(ps)
+            ps = [] // empty ps
         }
-        console.log(json)
-        const data = { Id: i, Embedding: JSON.stringify(json) }
-        await $contract.upsert(data)
     }
 }
 
@@ -192,5 +213,5 @@ if (process.argv[1].includes('src/contract')) {
     else if (process.argv[2] == 'removeNull') $contract.removeNull()
     else if (process.argv[2] == 'vyper') getVyper()
     else if (process.argv[2] == 'embed-all') embedAllAvg(process.argv[3], process.argv[4])
-    else if (process.argv[2] == 'tokenize-all') tokenAll(process.argv[3], process.argv[4])
+    // else if (process.argv[2] == 'tokenize-all') tokenAll(process.argv[3], process.argv[4])
 }

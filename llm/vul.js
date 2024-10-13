@@ -84,7 +84,7 @@ async function evaluate() {
 
 async function jsonData() {
     const system = `
-As a smart contract security expert, your task is to detect, locate, explain, and repair vulnerabilities in smart contracts.
+You are a smart contract security expert, your task is to detect, locate, and repair vulnerabilities in smart contracts.
 
 A smart contract may have one or more of the following vulnerabilities:
 - Timestamp Dependency (TP)
@@ -138,14 +138,14 @@ To effectively address and fix all vulnerabilities, follow this three-step instr
     // Split 80% of data for each key for training, and 20% for evaluation
     for (const key in json1) {
         const dataList = json1[key]
-        const dataList2 = $.getRandomElements(json2[key], Math.floor(dataList.length * 0.3))
+        const dataList2 = $.getRandomElements(json2[key], Math.floor(dataList.length * 0.2))
         const cutoff = Math.floor(dataList.length * 0.8)
         const cutoff2 = Math.floor(dataList2.length * 0.8)
         const slice1 = dataList.slice(0, cutoff).concat(dataList2.slice(0, cutoff2))
         const slice2 = dataList.slice(cutoff).concat(dataList2.slice(cutoff2))
 
         console.log(key)
-        console.log('total', dataList.length)
+        console.log('total', dataList.length + dataList2.length)
         console.log('train', slice1.length)
         console.log('test', slice2.length)
         console.log('empty', dataList2.length)
@@ -154,10 +154,10 @@ To effectively address and fix all vulnerabilities, follow this three-step instr
         test.push(...slice2)
     }
 
-    // balance empty data, reserve 10 percent
+    // calculate empty vulnerability data
     const empty = JSON.stringify([])
-    console.log('Train data count', `${train.filter(v => v.messages[2].content === empty).length}/${train.length}`)
-    console.log('Test data count', `${test.filter(v => v.messages[2].content === empty).length}/${test.length}`)
+    console.log('Empty/Train data', `${train.filter(v => v.messages[2].content === empty).length}/${train.length}`)
+    console.log('Empty/Test data', `${test.filter(v => v.messages[2].content === empty).length}/${test.length}`)
 
     // Write the train and eval data to separate JSON files
     writeFileSync(`${ROOT}/llm/data/train.jsonl`, JSON.stringify(train))

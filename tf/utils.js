@@ -19,27 +19,15 @@ const VOC = 50000 // total vocab
 
 module.exports = {
     // get embeddings from python API
-    // method = method = 'embedding' | 'embeddingAvg' | 'embeddingMax'
-    async embedAPI(text, method = 'embedding-avg') {
-        const url = `${process.env.EMBED_API}/${method}`
-        const form = new FormData()
-        form.append('text', text)
-        const response = await axios.post(url, form, {
-            headers: {
-                ...form.getHeaders() // Include necessary headers from FormData
-            }
-        })
+    // pool = 'avg' | 'cls' | 'max'
+    async embedAPI(text, pool = 'avg') {
+        const url = `${process.env.EMBED_API}/embedding`
+        const response = await axios.post(url, { text, pool })
         return response.data.embedding
     },
     async tokenizeAPI(text) {
         const url = `${process.env.EMBED_API}/tokenize`
-        const form = new FormData()
-        form.append('text', text)
-        const response = await axios.post(url, form, {
-            headers: {
-                ...form.getHeaders() // Include necessary headers from FormData
-            }
-        })
+        const response = await axios.post(url, { text })
         return response.data
     },
     removeBr(text) {

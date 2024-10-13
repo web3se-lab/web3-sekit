@@ -102,7 +102,15 @@ async function upsert(data) {
     return row
 }
 
+async function updateById(data) {
+    if (!data.Id) throw new Error('Data should include Id')
+    const row = await T.update(data, { where: { Id: data.Id } })
+    console.log('Update Contract', data.Id)
+    return row
+}
+
 async function updateByAddress(data) {
+    if (!data.ContractAddress) throw new Error('Data should include ContractAddress')
     const row = await T.update(data, { where: { ContractAddress: data.ContractAddress } })
     console.log('Update Contract', row[0].ContractAddress)
     return row
@@ -147,6 +155,7 @@ module.exports = {
     check,
     insert,
     upsert,
+    updateById,
     updateByAddress,
     getNetworkById,
     getNetwork,
