@@ -2,6 +2,9 @@ const { Contract } = require('./DB')
 const $ = require('../src/utils')
 const T = Contract
 
+async function findAll(opt) {
+    return await T.findAll(opt)
+}
 async function count() {
     return await T.count()
 }
@@ -148,6 +151,7 @@ if (process.argv[1].includes('db/contract')) {
 }
 
 module.exports = {
+    findAll,
     findOneByPk,
     findOneByAddress,
     count,

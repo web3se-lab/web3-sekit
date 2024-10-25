@@ -6,7 +6,7 @@ async function embed(req, res, next) {
         const code = req.body.code
         const type = req.body.type || 'solidity'
         const pool = req.body.pool || 'avg'
-        const tree = $.getCodeMap($.clearCode(code), type)
+        const tree = $.getCodeMap($.clearCode($.multiContracts(code), type), type)
 
         const data = []
         for (const i in tree) for (const j in tree[i]) tree[i][j] = data.push(tree[i][j]) - 1
@@ -23,7 +23,7 @@ async function tokenize(req, res, next) {
     try {
         const code = req.body.code
         const type = req.body.type || 'solidity'
-        const tree = $.getCodeMap($.clearCode(code), type)
+        const tree = $.getCodeMap($.clearCode($.multiContracts(code), type), type)
 
         const data = []
         for (const i in tree) for (const j in tree[i]) tree[i][j] = data.push(tree[i][j]) - 1
@@ -41,7 +41,7 @@ async function tree(req, res, next) {
     try {
         const code = req.body.code
         const type = req.body.type || 'solidity'
-        const data = $.getCodeMap($.clearCode(code), type)
+        const data = $.getCodeMap($.clearCode($.multiContracts(code), type), type)
         res.json(data)
     } catch (e) {
         next(e)

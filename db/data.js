@@ -61,6 +61,7 @@ async function getSourceCodeVulnerability(key) {
     return { sourceCode, codeTree, vulnerability, embedding, dir: res.Dir, detail: res.Detail, repair: res.Repair }
 }
 
+// tokens: Num.10000->Id: 10211
 async function countScamTypes(start, max) {
     start = parseInt(start) || 1
     max = parseInt(max) || (await Token.max('Id'))
@@ -78,6 +79,12 @@ async function countScamTypes(start, max) {
         }
     }
     console.log('Count', count)
+    console.log(scam)
+
+    // calculate weight
+    let all = 0
+    for (const i in scam) all += scam[i]
+    for (const i in scam) scam[i] = (scam[i] * 100) / all
     console.log(scam)
 }
 

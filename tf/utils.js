@@ -1,6 +1,5 @@
 require('dotenv').config()
 const TYPE = require('./type')
-const FormData = require('form-data')
 const axios = require('axios')
 const tf = require(process.env.TFJS)
 
@@ -22,11 +21,17 @@ module.exports = {
     // pool = 'avg' | 'cls' | 'max'
     async embedAPI(text, pool = 'avg') {
         const url = `${process.env.EMBED_API}/embedding`
+        // remove blank
+        for (const i in text) text[i] = text[i].replace(/\s\s+/g, ' ')
+
         const response = await axios.post(url, { text, pool })
         return response.data.embedding
     },
     async tokenizeAPI(text) {
         const url = `${process.env.EMBED_API}/tokenize`
+        // remove blank
+        for (const i in text) text[i] = text[i].replace(/\s\s+/g, ' ')
+
         const response = await axios.post(url, { text })
         return response.data
     },
@@ -35,8 +40,7 @@ module.exports = {
         text = text.replace(/<\/?.+?>/gm, "");
         text = text.replace(/[\r\n]/gm, "");
         */
-        text = text.replace(/\s\s+/g, ' ')
-        return text
+        return text.replace(/\s\s+/g, ' ')
     },
     UNIT: UNIT, // LSTM hidden units
     TYPE: TYPE, // 10 type dict

@@ -25,7 +25,8 @@ module.exports = {
             SwarmSource: DataTypes.STRING,
             Creator: DataTypes.STRING,
             ContractType: DataTypes.STRING,
-            Embedding: DataTypes.TEXT('long')
+            Embedding: DataTypes.TEXT('long'),
+            Embedding2: DataTypes.TEXT('long')
             // TokenIds: DataTypes.TEXT('long')
         },
         options: {
