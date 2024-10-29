@@ -11,7 +11,7 @@ const $ = require('../utils')
 const $data = require('../../db/data')
 
 const PAD = 0.0 // pad
-const DIM = 512 // dimension for sentence embedding
+const DIM = 768 // dimension for sentence embedding
 const SEQ = 256 // seq num limit for lstm (max number of functions)
 const START = 20000
 
@@ -23,7 +23,7 @@ module.exports = class MyModel {
      */
     constructor(name) {
         this.name = name
-        this.modelPath = `${ROOT}/tf/models/v2/${name}`
+        this.modelPath = `file://${ROOT}/tf/models/v2/${name}/model.json`
         this.evaluatePath = `${ROOT}/tf/evaluates/v2/${name}.json`
         this.tf = $.tf
         this.TYPE = $.TYPE
@@ -51,9 +51,8 @@ module.exports = class MyModel {
     preX(json) {
         if (!json) return null
 
-        const data = JSON.parse(json)
         const arr = []
-        for (const i in data) for (const j in data[i]) arr.push(data[i][j])
+        for (const i in json) for (const j in json[i]) arr.push(json[i][j])
         return arr
     }
 
@@ -61,9 +60,8 @@ module.exports = class MyModel {
     preY(json) {
         if (!json) return null
 
-        const ys = JSON.parse(json)
         const arr = new Array(Object.keys(this.TYPE).length).fill(0)
-        for (const item of ys) arr[this.TYPE[item.type]] = 1
+        for (const item of json) arr[this.TYPE[item.type]] = 1
         return arr
     }
 
@@ -74,7 +72,7 @@ module.exports = class MyModel {
         console.log('Path', this.modelPath)
         console.log('Evaluate', this.evaluatePath)
         console.log('Load mymodel...')
-        if (!this.mymodel) this.mymodel = await this.tf.node.loadSavedModel(this.modelPath)
+        if (!this.mymodel) this.mymodel = await this.tf.loadGraphModel(this.modelPath)
         console.log('========================= Load My Model ==========================')
     }
 
@@ -111,14 +109,16 @@ module.exports = class MyModel {
             await this.loadModel()
 
             while (count < slice) {
-                const res = await $data.getSourceCodeScam(id)
-                if (res && res.risk && res.codeTree) {
+                const res = await $data.getSourceCodeScam(id++)
+                if (res && res.risk && res.embedding) {
                     console.log('Evaluating')
                     console.log('Id', id)
                     console.log('Address', res.address)
-                    const xs = [this.preX(res.codeTree)]
-                    const yp = this.label(this.mymodel.predict(this.tf.tensor(this.padding(xs))).arraySync()) // the predicting y
-                    const ya = this.label([this.preY(res.risk)]) // the actual y
+                    const xs = [this.preX(res.embedding)]
+                    const yp = this.label(
+                        (await this.mymodel.executeAsync(this.tf.tensor(this.padding(xs)))).arraySync()
+                    )
+                    const ya = this.label([this.preY(res.risk)])
                     console.log('Predict', yp)
                     console.log('Actual', ya)
                     const predict = yp.vector[0]
@@ -139,7 +139,6 @@ module.exports = class MyModel {
                     evas.push(JSON.parse(JSON.stringify(eva)))
                     count++
                 }
-                id++
             }
 
             fs.writeFileSync(this.evaluatePath, JSON.stringify(evas))
@@ -164,16 +163,17 @@ module.exports = class MyModel {
             const ys = []
             while (xs.length < slice) {
                 const res = await $data.getSourceCodeScam(id)
-                if (res && res.risk && res.codeTree) {
+                if (res && res.risk && res.embedding) {
                     console.log('Predicting')
                     console.log('Id', id)
                     console.log('Address', res.address)
-                    xs.push(this.preX(res.codeTree))
+                    xs.push(this.preX(res.embedding))
                     ys.push(this.preY(res.risk))
                 }
                 id++
             }
-            const yp = this.label(this.mymodel.predict(this.tf.tensor(this.padding(xs))).arraySync())
+            const tx = this.tf.tensor(this.padding(xs))
+            const yp = this.label((await this.mymodel.executeAsync(tx)).arraySync())
             const ya = this.label(ys)
 
             console.log('Predict', yp)
@@ -193,7 +193,7 @@ module.exports = class MyModel {
             const risks = []
             vector[i] = []
             for (const j in arr[i]) {
-                vector[i][j] = arr[i][j] > 0.5 ? 1 : 0
+                vector[i][j] = arr[i][j] >= 0.5 ? 1 : 0
                 if (vector[i][j] === 1) for (const k in this.TYPE) if (this.TYPE[k] == j) risks.push(k)
             }
             name.push(risks)

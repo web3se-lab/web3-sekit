@@ -3,50 +3,21 @@
     "version": "2.0.0",
     "author": "devilyouwei",
     "license": "MIT",
-    "description": "Automated software engineering kits for Web3, Blockchain and Smart Contracts.",
+    "description": "Automated software engineering kits for Web3, Blockchain, and Smart Contracts.",
     "main": "web/app.js",
     "scripts": {
         "format": "prettier 'src/*.js' --write",
-        "clean": "rm -rf ./tf/logs/**/train ./tf/mymodels/**/*",
-        "DB": "node ./db/initDB.js",
-        "contract": "node ./db/contract.js",
-        "token": "node ./db/token.js",
-        "data": "node ./db/data.js",
-        "vulnerability": "node ./db/vulnerability.js",
-        "updateContract": "node ./src/contract.js",
-        "updateToken": "node ./src/token.js",
-        "updateVulnerability": "node ./src/vulnerability.js",
-        "scamsniper": "node ./src/scamsniper.js",
-        "safu": "node ./src/safu.js",
-        "tokenizer": "node ./tensorflow/tokenizer.js",
         "dev": "nodemon ./web/app.js",
         "restart": "pm2 restart ./web/app.js",
         "start": "pm2 start ./web/app.js",
         "stop": "pm2 stop ./web/app.js",
         "status": "pm2 status",
         "delete": "pm2 delete app",
-        "pm2-update": "pm2 update",
-        "highlight": "node ./tensorflow/modules/highlight.js",
-        "dense": "node ./tensorflow/dense.js",
-        "smartbert-dense": "node ./tensorflow/smartbert-dense.js",
-        "cnn": "node ./tensorflow/cnn.js",
-        "smartbert-cnn": "node ./tensorflow/smartbert-cnn.js",
-        "lstm": "node ./tensorflow/lstm.js",
-        "bilstm": "node ./tensorflow/bilstm.js",
-        "smartbert-lstm": "node ./tensorflow/smartbert-lstm.js",
-        "smartbert-high-lstm": "node ./tensorflow/smartbert-high-lstm.js",
-        "smartbert-high-bilstm": "node ./tensorflow/smartbert-high-bilstm.js",
-        "smartbert-bilstm": "node ./tensorflow/smartbert-bilstm.js",
-        "smartbert-dense-lstm": "node ./tensorflow/smartbert-dense-lstm.js",
-        "smartbert-dense-bilstm": "node ./tensorflow/smartbert-dense-bilstm.js",
-        "smartbert-concat-lstm": "node ./tensorflow/smartbert-concat-lstm.js",
-        "smartbert-concat-bilstm": "node ./tensorflow/smartbert-concat-bilstm.js",
-        "mysql": "docker-compose -f ./docker/docker-compose.yml up -d",
-        "ncu": "ncu -u"
+        "pm2-update": "pm2 update"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/decentralizedlab/web3-sekit"
+        "url": "git+https://github.com/web3se-lab/web3-sekit"
     },
     "keywords": [
         "web3",
@@ -58,9 +29,9 @@
         "deep learning"
     ],
     "bugs": {
-        "url": "https://github.com/decentralizedlab/web3-sekit/issues"
+        "url": "https://github.com/web3se-lab/web3-sekit/issues"
     },
-    "homepage": "http://web3.cas-ll.cn",
+    "homepage": "https://www.web3-se.com",
     "devDependencies": {
         "@types/bluebird": "^3.5.42",
         "@types/serve-index": "^1.9.1",
@@ -73,8 +44,8 @@
     },
     "dependencies": {
         "@stdlib/assert-is-json": "^0.1.1",
-        "@tensorflow/tfjs-node": "^4.20.0",
-        "@tensorflow/tfjs-node-gpu": "^4.20.0",
+        "@tensorflow/tfjs-node": "^4.22.0",
+        "@tensorflow/tfjs-node-gpu": "^4.22.0",
         "app-root-path": "^3.1.0",
         "axios": "^1.7.4",
         "bert-tokenizer": "^1.1.8",

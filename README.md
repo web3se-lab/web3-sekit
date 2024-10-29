@@ -6,7 +6,7 @@
 
 To try our research tools online, please visit the following website:
 
-👉 <https://www.web3-se.com/>
+👉 <https://www.web3-se.com>
 
 ## Tookkit
 
@@ -167,7 +167,7 @@ If you would like to set up a localhost database, we prepare a `docker-compose.y
 To start a MySQL docker service locally, try:
 
 ```bash
-yarn mysql
+docker-compose -f ./docker/docker-compose.yml
 ```
 
 To connect to local mysql database, you can create and modify the `.env` as the following content:
@@ -181,7 +181,9 @@ MYSQL_PASS=web3
 MYSQL_DB=web3
 
 # SMARTBERT
-EMBED_API=http://192.168.99.35:8000
+EMBED_API=
+
+# this service port
 WEB_PORT=8081
 
 # for CPU mode
@@ -195,15 +197,21 @@ Then you can test your database connection and create the initial tables:
 ```bash
 
 # test connect to databases
-yarn DB test
+node ./db/DB.js test
 
 # init tables, if table is not input, default is all the tables
-yarn DB init [Table]
+node ./db/DB.js init [table_name]
 
 # drop tables, be careful!
-yarn DB drop [Table]
+node ./db/DB.js drop [table_name]
 
 ```
+
+We use [sequelize](https://sequelize.org/) to manage a database.
+
+For the details of data structures, please refer to `db/Model.js`
+
+To get the entire database backup, pleas contact us: **huangyw@iict.ac.cn**
 
 ## Web
 
@@ -232,276 +240,39 @@ yarn stop
 
 **POST params**
 
-1. `code` smart contract code content
-2. `type` "solidity" or "vyper", the default is "solidity"
+1. `code` smart contract code content (Solidity)
+2. `pool` pooling type: `avg`, `max`, `cls`
 
 EXAMPLE: [embed](http://api.smart.cas-ll.cn/smartbert/embed) is used to convert smart contract code to embedding vectors:
 
 ```json
 {
     "code": "input solidity code here",
-    "type": "solidity"
+    "pool": "avg"
 }
 ```
-
-## Operation
-
-**Update Contract Table**
-
-Contract API default is from BSC MainNet bscscan.com, you may change network in crawler/updateContract.js
-
-```bash
-# crawl from an address
-yarn updateContract 0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82
-
-# crawl from csv file in /db
-yarn updateContract csv [from=ContractAddress]
-
-# crawl from token list on BSC
-yarn updateContract tokens
-
-# label out token contracts, BEP20, 721...
-# also add creator, txhash info to Contract table
-yarn updateContract labelToken [startId] [endId]
-
-# remove contracts without SourceCode
-yarn updateContract removeNull
-```
-
-**Update token info in Token table**
-
-For token's basic info, price, bnb LP, busd LP, marketcap, transfers...
-
-```bash
-# need UI, from bscscan
-yarn updateToken info [start]
-
-# is honeypot and honeypot info
-yarn updateToken honeypot [start]
-
-# remove null token
-yarn updateToken removeNull
-
-# update and label token risks
-# need UI, from scamsniper
-yarn updateToken risk [start]
-```
-
-**Update from safu**
-
-```bash
-# update scam possibility code
-yarn safu scam [start] [end]
-
-# simulate buy and update honeypot
-yarn safu honeypot [start] [end]
-```
-
-**Select data from tables**
-
-```bash
-# count total num of contracts
-yarn contract count
-
-# get contract info by id, address
-yarn contract get [id|address]
-
-# get contract max id
-yarn contract max
-
-# check contract address exsited
-yarn contract check [address]
-
-# get contracts without SourceCode
-yarn contract findNull
-
-# remove contracts without SourceCode
-yarn contract removeNull
-
-# get contract network by address
-yarn contract network [address]
-
-# get token by id
-yarn token get [id]
-
-# get token by address
-yarn token get [address]
-
-# count token table rows
-yarn token count
-
-# get code data from codes by Id, Address
-yarn code get [Id|Address]
-
-# get max Id of code table
-yarn code max
-
-# get max compiled code Id from code table
-yarn code max-compile
-
-# get max embedding code Id from code table
-yarn code max-embedding
-
-# get word id
-yarn word getId [word piece]
-
-# get word by id
-yarn word getWord [word id]
-
-# count word pieces in table
-yarn word count
-
-# get code and risk relations
-yarn data code-risk [Id|Address]
-
-# count total types of contracts
-yarn data count-token-type
-
-# count different scam intents of risk
-yarn data count-scam
-
-# count different levels of risk
-yarn data count-risk
-
-# count total honeypots amount in database
-yarn data count-honeypot
-
-# generate a json or txt dataset file
-yarn data code-txt
-yarn data json-txt
-```
-
-**Compile and clean source code**
-
-```bash
-# compile all to low-level code
-yarn updateCode all [start] [end]
-
-# remove unconerned code: comments, heads, imports...
-yarn updateCode clean [start] [end]
-
-# extract functions tree map from contracts
-yarn updateCode tree [start] [end]
-```
-
-**Tokenizer and embedding**
-
-In this project, we use [sentence-piece](https://github.com/google/sentencepiece) as the tokenizer. It implements **BPE** and **unigram language model**.
-
-If you would like to generate your own dataset tokenizer model, you need to prepare a `data.txt` file in `/db/data.txt`.
-
-Install python3 and pip.
-
-```bash
-# generate the data.txt
-yarn data code-txt
-yarn data json-txt
-
-# go to sentence-piece dir
-cd tensorflow/models/sentence-piece
-
-# run python
-pip install sentencepiece
-
-python3 ./spm.py
-```
-
-Then you will get two tokenizer files: `sentencepiece.model` and `sentencepiece.vocab`
-
-We have wrapped a **JS version** of sentence-piece for this project.
-
-To test sentence-piece tokenizer:
-
-```bash
-# get a contract's word piece tokens listed by functions
-yarn tokenizer get [Id|Address]
-
-# get the max word piece tokens of all the contracts
-yarn tokenizer max [start]
-
-# update word dictionary
-yarn tokenizer update-word [start]
-
-# count functions in a contract
-yarn tokenizer count-fun [id]
-
-# count a max functions contract in table
-yarn tokenizer max-fun [start]
-```
-
-## Tensorflow.js
-
-**K-means Intent Highlight Model**
-
-```bash
-# train k-means model
-yarn highlight train [fromId] [slice] [rate] [maxIter]
-
-# load trained highlight k-means model
-yarn highlight load
-
-# predict by highlight k-means cluster
-yarn highlight predict [Id]
-```
-
-**MyModels**
-
-```bash
-# train mymodel using BiLSTM and intent highlight scale
-yarn mymodel-bilstm-high-scale train [batches] [batchSize] [epoch] [fromId]
-
-# evaluate mymodel using BiLSTM and intent highlight scale
-yarn mymodel-bilstm-high-scale evaluate [fromId] [slice] [batchSize]
-
-# predict mymodel using BiLSTM and intent highlight scale
-yarn mymodel-bilstm-high-scale predict [fromId] [slice]
-
-# model summary
-yarn mymodel-bilstm-high-scale summary
-
-# train model using LSTM
-yarn mymodel-lstm evaluate [fromId] [slice] [batchSize]
-yarn mymodel-lstm evaluate [batches] [batchSize] [epoch] [fromId]
-yarn mymodel-lstm predict [fromId] [slice]
-
-yarn mymodel-bilstm evaluate [fromId] [slice] [batchSize]
-yarn mymodel-bilstm evaluate [batches] [batchSize] [epoch] [fromId]
-yarn mymodel-bilstm predict [fromId] [slice]
-
-yarn mymodel-cnn evaluate [fromId] [slice] [batchSize]
-yarn mymodel-cnn evaluate [batches] [batchSize] [epoch] [fromId]
-yarn mymodel-cnn predict [fromId] [slice]
-
-yarn mymodel-bilstm-high-asc evaluate [fromId] [slice] [batchSize]
-yarn mymodel-bilstm-high-asc evaluate [batches] [batchSize] [epoch] [fromId]
-yarn mymodel-bilstm-high-asc predict [fromId] [slice]
-
-yarn mymodel-bilstm-high-desc evaluate [fromId] [slice] [batchSize]
-yarn mymodel-bilstm-high-desc evaluate [batches] [batchSize] [epoch] [fromId]
-yarn mymodel-bilstm-high-desc predict [fromId] [slice]
-```
-
-We use [sequelize](https://sequelize.org/) to manage a database.
-
-For the details of data structures, please refer to `crawler/Model.js`
 
 ## Paper
 
 Continuously writing and updating...
 
+```tex
 @article{huang2022deep,
 title={Deep Smart Contract Intent Detection},
 author={Huang, Youwei and Zhang, Tao and Fang, Sen and Tan, Youshuai},
 journal={arXiv preprint arXiv:2211.10724},
 year={2022}
 }
+```
 
+```tex
 @article{huang2022smartintentnn,
 title={SmartIntentNN: Towards Smart Contract Intent Detection},
 author={Huang, Youwei and Zhang, Tao and Fang, Sen and Tan, Youshuai},
 journal={arXiv preprint arXiv:2211.13670},
 year={2022}
 }
+```
 
 ## Resource
 
@@ -521,3 +292,7 @@ year={2022}
 1. [TensorFlow.js](https://js.tensorflow.org/api/latest/)
 2. [TensorFlow Hub](https://tfhub.dev/)
 3. [Universal Sentence Encoder V4](https://tfhub.dev/google/universal-sentence-encoder/4)
+
+## Acknowledgment
+
+-   [Institute of Intelligent Computing Technology, Suzhou, CAS](http://iict.ac.cn/)

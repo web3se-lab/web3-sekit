@@ -283,7 +283,7 @@ module.exports = class MyModel {
             const risks = []
             vector[i] = []
             for (const j in arr[i]) {
-                vector[i][j] = arr[i][j] > 0.5 ? 1 : 0
+                vector[i][j] = arr[i][j] >= 0.5 ? 1 : 0
                 if (vector[i][j] === 1) for (const k in this.TYPE) if (this.TYPE[k] == j) risks.push(k)
             }
             name.push(risks)
