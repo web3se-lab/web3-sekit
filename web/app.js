@@ -14,7 +14,7 @@ const allowCrossDomain = function (req, res, next) {
     res.header('Access-Control-Allow-Methods', 'GET,POST')
     res.header('Access-Control-Allow-Headers', 'Content-Type')
     res.header('Access-Control-Allow-Credentials', 'true')
-    if (req.method.toLowerCase() == 'options') return res.send(200)
+    if (req.method.toLowerCase() == 'options') return res.sendStatus(200)
     const path = req.path.split('/')
     if (path[path.length - 1] === 'favicon.ico') return res.send(`${ROOT}/static/favicon.ico`)
     next()

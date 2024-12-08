@@ -83,10 +83,8 @@ async function evaluate(req, res, next) {
             data.push({ title: 'USE + BiLSTM + Highlight (X16)', data: `v${version}/use-high-bilstm-x16.json` })
         } else if (version === 2) {
             // SmartIntentNN V2
-            data.push({ title: 'SmartBERT + Dense', data: `v${version}/smartbert_dense.json` })
-            data.push({ title: 'SmartBERT + CNN', data: `v${version}/smartbert_cnn.json` })
-            data.push({ title: 'SmartBERT + LSTM', data: `v${version}/smartbert_lstm.json` })
-            data.push({ title: 'SmartBERT + BiLSTM', data: `v${version}/smartbert_bilstm.json` })
+            data.push({ title: 'SmartBERT + LSTM', data: `v${version}/smartbert_lstm_js.json` })
+            data.push({ title: 'SmartBERT + BiLSTM', data: `v${version}/smartbert_bilstm_js.json` })
         }
 
         return res.json({ title: data[index].title, data: $.loadJson(`${EVA_PATH}/${data[index].data}`) })

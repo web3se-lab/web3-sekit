@@ -20,33 +20,33 @@ To try our research tools online, please visit the following website:
 
 ### Project-1: SmartBERT
 
+![SmartBERT API](./imgs/smartbert.png)
+
 **Task:** Learn representations from smart contracts and provide a service for smart contract embedding.
 
 **Link:** <https://github.com/web3se-lab/SmartBERT>
-
-![SmartBERT API](./imgs/smartbert.png)
 
 **Technical Points:**
 
 -   Convert **smart contract** code context to vectors.
 -   Built with **BERT/RoBERTa**-based pre-training models.
--   MLM-trained on **40,000+** real smart contracts.
+-   MLM-trained on **16,000+** (V2) real smart contracts.
 -   Serving APIs: [tokenize](http://api.smart.cas-ll.cn/smartbert/tokenize), [embed](http://api.smart.cas-ll.cn/smartbert/embed), [code tree](http://api.smart.cas-ll.cn/smartbert/tree).
 
 ### Project-2: SmartIntentNN
 
+![SmartIntentNN Example](./imgs/example.png)
+
 🤩 **SmartIntentNN** is a deep neural network tool powered by [Tensorflow.js](https://github.com/tensorflow/tfjs).
 
-**Task:** Build a DNN-based model to detect developers' malicious intents in smart contracts.
+**Task:** Build a deep learning model to detect developers' unsafe intents in smart contracts.
 
 **Website:** <https://www.web3-se.com>
-
-![SmartIntentNN Example](./imgs/example.png)
 
 **Technical Guide:**
 
 -   ⚙️ Frontend repository: <https://github.com/web3se-lab/web3-sekit-vue>
--   📱 Pages for testing the model online: [Home](https://www.web3-se.com/), [Highlight](https://www.web3-se.com/highlight/), [Evaluation](https://www.web3-se.com/evaluate/)
+-   📱 Pages for testing the model online: [Detect](https://www.web3-se.com/), [Highlight](https://www.web3-se.com/highlight/), [Evaluate](https://www.web3-se.com/evaluate/)
 -   🕵️ Click **"Detect My Smart Contract"** to copy and detect your customized smart contract.
 -   🚀 Click **"Predict 🚀"** to detect the malicious intents in smart contracts.
 -   🌲 Click **"CCTree 🌲"** to view the smart contract code tree.
@@ -57,14 +57,19 @@ To try our research tools online, please visit the following website:
 -   SmartIntentNN V1.0 employs a **Universal Sentence Encoder** to generate smart contract embeddings.
 -   The intent highlight model is trained using **K-means clustering**.
 -   SmartIntentNN V2.0 will integrate **SmartBERT** to embed smart contracts.
--   SmartIntentNN V2.0 is currently under construction. Stay tuned! (Maybe see in FSE2025)
+-   SmartIntentNN V2.0 is currently under writing. Stay tuned! (Maybe meet in FSE2025)
 
 ## Dataset
 
-**💽 Use our [dataset](https://api.smart.cas-ll.cn)**
+We have compiled a comprehensive dataset of **vulnerabilities** and **intents** in smart contracts!
 
-The above URL provides a `GET/POST JSON` API.
-You can query data by changing the parameter `key` in the URL.
+**💽 Access Our Dataset via this API: <https://api.smart.cas-ll.cn>**
+
+The URL above offers a `GET/POST JSON` API.
+
+You can query data by modifying the `key` parameter in the URL.
+
+Please refer to the guidelines below:
 
 ### Smart Contract Intent
 

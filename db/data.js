@@ -40,7 +40,7 @@ async function getSourceCodeScam(key) {
         console.log('Scams', risk)
     }
 
-    return { sourceCode, risk, type, address, codeTree, embedding }
+    return { id: res.Id, sourceCode, risk, type, address, codeTree, embedding }
 }
 
 // get vulnerability with source code
@@ -55,7 +55,7 @@ async function getSourceCodeVulnerability(key) {
     const vulnerability = JSON.parse(res.Vulnerability)
     const embedding = JSON.parse(res.contract.Embedding2)
     const sourceCode = res.contract.SourceCode
-    const codeTree = $.getCodeMap($.clearCode($.multiContracts(res.contract.SourceCode)))
+    const codeTree = null // $.getCodeMap($.clearCode($.multiContracts(res.contract.SourceCode)))
 
     if (process.argv[2] === 'code-vul') {
         console.log('Id', res.Id)
@@ -63,7 +63,16 @@ async function getSourceCodeVulnerability(key) {
         console.log('Vulnerability', vulnerability)
     }
 
-    return { sourceCode, codeTree, vulnerability, embedding, dir: res.Dir, detail: res.Detail, repair: res.Repair }
+    return {
+        id: res.Id,
+        sourceCode,
+        codeTree,
+        vulnerability,
+        dir: res.Dir,
+        detail: res.Detail,
+        repair: res.Repair,
+        embedding
+    }
 }
 
 // tokens: Num.10000->Id: 10211

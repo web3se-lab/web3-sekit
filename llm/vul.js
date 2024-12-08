@@ -5,6 +5,7 @@ const UniAI = require('uniai').default
 const { readFileSync, writeFileSync } = require('fs')
 const { ChatModelProvider, ChatModel, ChatRoleEnum } = require('uniai')
 const $data = require('../db/data')
+const $vul = require('../db/vulnerability')
 const $ = require('./util')
 const { OPENAI_KEY, OPENAI_API, GLM_API, ZHIPU_AI_KEY } = process.env
 
@@ -16,7 +17,7 @@ const ai = new UniAI({ OpenAI: { key: OPENAI_KEY, proxy: OPENAI_API }, GLM: { lo
  */
 async function detect(id, provider = ChatModelProvider.GLM, model = ChatModel.GLM_9B) {
     const system = `
-As a smart contract security expert, your task is to detect, locate, explain, and repair vulnerabilities in smart contracts.
+You are a smart contract security expert, your task is to detect, locate, and repair vulnerabilities in smart contracts.
 
 A smart contract may have one or more of the following vulnerabilities:
 - Timestamp Dependency (TP)
@@ -28,6 +29,7 @@ To effectively address and fix all vulnerabilities, follow this three-step instr
 1. **Detect**: Check for any vulnerabilities based on provided criteria and categorize them.
 2. **Locate**: Pinpoint the exact location of the vulnerabilities in the code, include the vulnerable code snippet, and briefly explain the issue.
 3. **Repair**: Fix the identified vulnerabilities and provide the corrected code.
+
 `
 
     const data = await $data.getSourceCodeVulnerability(id)
@@ -35,7 +37,9 @@ To effectively address and fix all vulnerabilities, follow this three-step instr
 
     const input = [
         { role: ChatRoleEnum.SYSTEM, content: `${system}\nSmart Contract:\n${data.sourceCode}` },
-        { role: ChatRoleEnum.USER, content: `Detect the vulnerabilities in the smart contract` }
+        { role: ChatRoleEnum.USER, content: `Detect` }
+        // { role: ChatRoleEnum.ASSISTANT, content: JSON.stringify(data.vulnerability) },
+        // { role: ChatRoleEnum.USER, content: `Locate` }
     ]
 
     const res = await ai.chat(input, { provider, model })
@@ -100,7 +104,7 @@ To effectively address and fix all vulnerabilities, follow this three-step instr
 `
 
     // structure train data set
-    const max = 4371
+    const max = await $vul.maxId()
     const json1 = {} // push vulnerable data
     const json2 = {} // push empty data
 
@@ -116,8 +120,12 @@ To effectively address and fix all vulnerabilities, follow this three-step instr
             if (!json1[dir]) json1[dir] = []
             const messages = [
                 { role: ChatRoleEnum.SYSTEM, content: `${system}\nSmart Contract:\n${data.sourceCode}` },
-                { role: ChatRoleEnum.USER, content: `Detect the vulnerabilities in the smart contract` },
-                { role: ChatRoleEnum.ASSISTANT, content: JSON.stringify(vulnerability) }
+                { role: ChatRoleEnum.USER, content: `Detect` },
+                { role: ChatRoleEnum.ASSISTANT, content: JSON.stringify(vulnerability) },
+                { role: ChatRoleEnum.USER, content: `Locate` },
+                { role: ChatRoleEnum.ASSISTANT, content: detail },
+                { role: ChatRoleEnum.USER, content: `Repair` },
+                { role: ChatRoleEnum.ASSISTANT, content: repair }
             ]
             json1[dir].push({ messages })
         } else {
@@ -125,7 +133,9 @@ To effectively address and fix all vulnerabilities, follow this three-step instr
             const messages = [
                 { role: ChatRoleEnum.SYSTEM, content: `${system}\nSmart Contract:\n${data.sourceCode}` },
                 { role: ChatRoleEnum.USER, content: `Detect the vulnerabilities in the smart contract` },
-                { role: ChatRoleEnum.ASSISTANT, content: JSON.stringify([]) }
+                { role: ChatRoleEnum.ASSISTANT, content: JSON.stringify([]) },
+                { role: ChatRoleEnum.USER, content: `Locate the vulnerabilities in the smart contract` },
+                { role: ChatRoleEnum.ASSISTANT, content: `No vulnerabilities` }
             ]
             json2[dir].push({ messages })
         }
@@ -171,6 +181,7 @@ async function markdown(file, index) {
     let md = ``
     md += `## Contract\n\n\`\`\`solidity\n${data.messages[0].content}\n\`\`\`\n`
     md += `## Vulnerability\n\n\`\`\`json\n${data.messages[2].content}\n\`\`\`\n`
+    md += `## Detail\n\n\`\`\`json\n${data.messages[4].content}\n\`\`\`\n`
     writeFileSync(`${ROOT}/llm/md/${file}-${index}.md`, md)
 }
 

@@ -220,7 +220,7 @@ async function dataset(type = 'train', start = 1, limit) {
     const data = new Set()
     for (const item of res) {
         console.log(item.Id)
-        const type = item.CompilerVersion.includes('vyper') ? 'vyper' : 'solidity'
+        const type = item.CompilerVersion == 'vyper' ? 'vyper' : 'solidity'
         const code = $.getCodeMap($.clearCode($.multiContracts(item.SourceCode), type), type)
         for (const i in code) for (const j in code[i]) data.add(removeBr(code[i][j]))
     }

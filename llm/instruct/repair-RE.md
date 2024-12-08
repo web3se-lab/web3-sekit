@@ -8,10 +8,10 @@ Always update state variables before making external calls.
 function withdraw(uint _amount) public {
     require(balances[msg.sender] >= _amount);
 
-    // Modify state first
+    // Effect
     balances[msg.sender] -= _amount;
 
-    // Then interact with external
+    // Interaction
     (bool success, ) = msg.sender.call{value: _amount}("");
     require(success, "Transfer failed.");
 }
@@ -44,31 +44,24 @@ contract MyContract is ReentrancyGuard {
 }
 ```
 
-## 3. Reordering Calls
+## 3. Using ReentrancyGuard Library
 
-Ensure all state changes are completed before making external calls.
-
-```solidity
-function safeWithdraw() public noReentrancy {
-    uint amount = balances[msg.sender];
-
-    require(amount > 0, "Insufficient balance");
-
-    balances[msg.sender] = 0;
-
-    (bool success, ) = msg.sender.call{value: amount}("");
-    require(success, "Transfer failed.");
-}
-```
-
-## 4. Using `transfer` or `send`
-
-These methods limit the gas available for the called contract, preventing extensive computations in the callback.
+Use OpenZeppelin `nonReentrant` for the contract function:
 
 ```solidity
-function withdraw(uint _amount) public {
-    require(balances[msg.sender] >= _amount);
-    balances[msg.sender] -= _amount;
-    msg.sender.transfer(_amount);
+// 引入OpenZeppelin的ReentrancyGuard
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+
+contract SecureBank is ReentrancyGuard {
+    mapping(address => uint256) balances;
+
+    // 通过nonReentrant修饰符防止reentrancy
+    function withdraw(uint256 amount) external nonReentrant {
+        require(balances[msg.sender] >= amount, "Insufficient balance");
+
+        balances[msg.sender] -= amount;
+        (bool success, ) = msg.sender.call.value(amount)("");
+        require(success, "Failed to send Ether");
+    }
 }
 ```

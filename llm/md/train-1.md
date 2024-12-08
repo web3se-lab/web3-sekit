@@ -2,7 +2,7 @@
 
 ```solidity
 
-As a smart contract security expert, your task is to detect, locate, explain, and repair vulnerabilities in smart contracts.
+You are a smart contract security expert, your task is to detect, locate, and repair vulnerabilities in smart contracts.
 
 A smart contract may have one or more of the following vulnerabilities:
 - Timestamp Dependency (TP)
@@ -487,4 +487,58 @@ contract TTPresale is AccessService {
 
 ```json
 {"timestamp dependency":["TTPresale"]}
+```
+## Detail
+
+```json
+Certainly! The smart contract `TTPresale` contains timestamp dependency vulnerabilities in the function `_buyDiscountTTM`. Here are the specific code snippets where the vulnerabilities are located along with a brief explanation:
+
+### Vulnerability: Timestamp Dependency (TP)
+#### Function `_buyDiscountTTM`
+```solidity
+function _buyDiscountTTM(uint256 _value, uint256 _mgrId, address _gameWalletAddr, address _buyer) 
+    private  
+{
+    require(_gameWalletAddr != address(0));
+    if (_mgrId == 1) {
+        require(nextDiscountTTMTokenId1 <= 50, "This Manager is sold out");
+        
+        if (block.timestamp <= endDiscountTime) {
+            require(_value == 0.64 ether);
+        } else {
+            require(_value == 0.99 ether);
+        }
+        
+        nextDiscountTTMTokenId1 += 1;
+        ttmToken.safeGiveByContract(nextDiscountTTMTokenId1 - 1, _gameWalletAddr);
+        emit ManagerSold(_buyer, _gameWalletAddr, 1, nextDiscountTTMTokenId1);
+    } else if (_mgrId == 6) {
+        require(nextDiscountTTMTokenId6 <= 390, "This Manager is sold out");
+        
+        if (block.timestamp <= endDiscountTime) {
+            require(_value == 0.97 ether);
+        } else {
+            require(_value == 1.49 ether);
+        }
+        
+        nextDiscountTTMTokenId6 += 1;
+        ttmToken.safeGiveByContract(nextDiscountTTMTokenId6 - 1, _gameWalletAddr);
+        emit ManagerSold(_buyer, _gameWalletAddr, 6, nextDiscountTTMTokenId6);
+    } else {
+        require(false);
+    }
+}
+```
+
+#### Explanation:
+- **TDInvocation**: The function `_buyDiscountTTM` includes the usage of `block.timestamp`.
+- **TDAssign or TDContaminate**: The value of `block.timestamp` is used in the conditional statements on lines 7 and 14 to compare it with `endDiscountTime` to determine the required `_value`.
+
+The use of `block.timestamp` in these conditional statements introduces a timestamp dependency vulnerability because the outcome of the function is directly influenced by the time and this can be manipulated, albeit within certain constraints.
+
+By labeling:
+1. **TDInvocation**: `block.timestamp` is invoked.
+2. **TDAssign or TDContaminate**: The result of `block.timestamp` comparison directly affects the conditional logic which determines the `_value`.
+
+Therefore, the function `_buyDiscountTTM` fulfills the combined pattern: **TimestampInvoc ∧ (TimestampAssign ∨ TimestampContaminate)**, marking it as suspicious for timestamp dependency vulnerability.
 ```

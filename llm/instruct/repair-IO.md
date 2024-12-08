@@ -33,7 +33,7 @@ function safeDiv(uint256 a, uint256 b) public pure returns (uint256) {
 
 ## 2. Using SafeMath Library (for Solidity < 0.8.0)
 
-Use `SafeMath` for earlier versions of Solidity to provide built-in overflow checks.
+Use OpenZeppelin `SafeMath` for earlier versions of Solidity to provide built-in overflow checks.
 
 ```solidity
 pragma solidity ^0.6.0;
