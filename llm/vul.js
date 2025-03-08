@@ -87,22 +87,6 @@ async function evaluate() {
 }
 
 async function jsonData() {
-    const system = `
-You are a smart contract security expert, your task is to detect, locate, and repair vulnerabilities in smart contracts.
-
-A smart contract may have one or more of the following vulnerabilities:
-- Timestamp Dependency (TP)
-- Reentrancy (RE)
-- Integer Overflow/Underflow (IO)
-- Dangerous delegatecall (DE)
-
-To effectively address and fix all vulnerabilities, follow this three-step instructions:
-1. **Detect**: Check for any vulnerabilities based on provided criteria and categorize them.
-2. **Locate**: Pinpoint the exact location of the vulnerabilities in the code, include the vulnerable code snippet, and briefly explain the issue.
-3. **Repair**: Fix the identified vulnerabilities and provide the corrected code.
-
-`
-
     // structure train data set
     const max = await $vul.maxId()
     const json1 = {} // push vulnerable data
@@ -119,7 +103,7 @@ To effectively address and fix all vulnerabilities, follow this three-step instr
         if (vulnerability) {
             if (!json1[dir]) json1[dir] = []
             const messages = [
-                { role: ChatRoleEnum.SYSTEM, content: `${system}\nSmart Contract:\n${data.sourceCode}` },
+                { role: ChatRoleEnum.SYSTEM, content: data.sourceCode },
                 { role: ChatRoleEnum.USER, content: `Detect` },
                 { role: ChatRoleEnum.ASSISTANT, content: JSON.stringify(vulnerability) },
                 { role: ChatRoleEnum.USER, content: `Locate` },
@@ -131,10 +115,12 @@ To effectively address and fix all vulnerabilities, follow this three-step instr
         } else {
             if (!json2[dir]) json2[dir] = []
             const messages = [
-                { role: ChatRoleEnum.SYSTEM, content: `${system}\nSmart Contract:\n${data.sourceCode}` },
-                { role: ChatRoleEnum.USER, content: `Detect the vulnerabilities in the smart contract` },
+                { role: ChatRoleEnum.SYSTEM, content: data.sourceCode },
+                { role: ChatRoleEnum.USER, content: `Detect` },
                 { role: ChatRoleEnum.ASSISTANT, content: JSON.stringify([]) },
-                { role: ChatRoleEnum.USER, content: `Locate the vulnerabilities in the smart contract` },
+                { role: ChatRoleEnum.USER, content: `Locate` },
+                { role: ChatRoleEnum.ASSISTANT, content: `No vulnerabilities` },
+                { role: ChatRoleEnum.USER, content: `Repair` },
                 { role: ChatRoleEnum.ASSISTANT, content: `No vulnerabilities` }
             ]
             json2[dir].push({ messages })

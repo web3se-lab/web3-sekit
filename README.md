@@ -216,7 +216,7 @@ We use [sequelize](https://sequelize.org/) to manage a database.
 
 For the details of data structures, please refer to `db/Model.js`
 
-To get the entire database backup, pleas contact us: **huangyw@iict.ac.cn**
+To get the entire database backup, please contact us: **devilyouwei@foxmail.com**
 
 ## Web
 
@@ -263,19 +263,19 @@ Continuously writing and updating...
 
 ```tex
 @article{huang2022deep,
-title={Deep Smart Contract Intent Detection},
-author={Huang, Youwei and Zhang, Tao and Fang, Sen and Tan, Youshuai},
-journal={arXiv preprint arXiv:2211.10724},
-year={2022}
+  title={Deep smart contract intent detection},
+  author={Huang, Youwei and Fang, Sen and Li, Jianwen and Tao, Jiachun and Hu, Bin and Zhang, Tao},
+  journal={arXiv preprint arXiv:2211.10724},
+  year={2022}
 }
 ```
 
 ```tex
 @article{huang2022smartintentnn,
-title={SmartIntentNN: Towards Smart Contract Intent Detection},
-author={Huang, Youwei and Zhang, Tao and Fang, Sen and Tan, Youshuai},
-journal={arXiv preprint arXiv:2211.13670},
-year={2022}
+  title={Smartintentnn: Towards smart contract intent detection},
+  author={Huang, Youwei and Fang, Sen and Li, Jianwen and Hu, Bin and Zhang, Tao},
+  journal={arXiv preprint arXiv:2211.13670},
+  year={2022}
 }
 ```
 
