@@ -2,6 +2,8 @@
 
 🤩 We are building a comprehensive toolkit for **Software Engineering of Web3**.
 
+The repo of **SmartIntentNN V2** is here: <https://github.com/web3se-lab/SmartIntent-py>
+
 ## Online
 
 To try our research tools online, please visit the following website:
@@ -57,7 +59,7 @@ To try our research tools online, please visit the following website:
 -   SmartIntentNN V1.0 employs a **Universal Sentence Encoder** to generate smart contract embeddings.
 -   The intent highlight model is trained using **K-means clustering**.
 -   SmartIntentNN V2.0 will integrate **SmartBERT** to embed smart contracts.
--   SmartIntentNN V2.0 is currently under writing. Stay tuned! (Maybe meet in FSE2025)
+-   SmartIntentNN V2.0 is currently under writing. Stay tuned! (Maybe meet in ICSE2026).
 
 ## Dataset
 
@@ -75,7 +77,7 @@ Please refer to the guidelines below:
 
 <https://api.smart.cas-ll.cn/data/intent?key=1>
 
-Please iterate over keys: `1, 2, 3, ...`. If an error occurs, skip that key and continue (key++, continue)
+Please iterate over keys: `1, 2, 3, ...`. If an error occurs, skip that key and continue (key++, continue).
 
 Ground truth label distribution for Intent data:
 
@@ -96,7 +98,7 @@ Ground truth label distribution for Intent data:
 
 <https://api.smart.cas-ll.cn/data/vulnerability?key=1>
 
-Please iterate over keys: `1, 2, 3, ...`. If an error occurs, skip that key and continue (key++, continue)
+Please iterate over keys: `1, 2, 3, ...`. If an error occurs, skip that key and continue (key++, continue).
 
 Ground truth label distribution for Vulnerability data:
 
@@ -133,6 +135,8 @@ How to run these models in Tensorflow.js?
 ### Training & Evaluating Settings
 
 See settings in `/tf/v1/model.js`.
+
+The following is the setup of SmartIntentNN (V1).
 
 **Training**
 
@@ -289,14 +293,15 @@ Continuously writing and updating...
 
 ### DataSource
 
-1. [https://bscscan.com/](https://bscscan.com/)
-2. [https://etherscan.io/](https://etherscan.io/)
-3. [https://tokensniffer.com/](https://tokensniffer.com/)
-4. [https://bscheck.eu/](https://bscheck.eu/)
-5. [https://scamsniper.net/](https://scamsniper.net/)
-6. [https://aphd.github.io/smart-corpus/](https://aphd.github.io/smart-corpus/)
-7. [https://dashboard.tenderly.co/explorer/](https://dashboard.tenderly.co/explorer/)
-8. [https://tools.staysafu.org/](https://tools.staysafu.org/)
+1. <https://bscscan.com>
+2. <https://etherscan.io>
+3. <https://tokensniffer.com>
+4. <https://bscheck.eu>
+5. <https://scamsniper.net>
+6. <https://aphd.github.io/smart-corpus>
+7. <https://dashboard.tenderly.co/explorer>
+8. <https://tools.staysafu.org>
+9. <https://github.com/Messi-Q/Smart-Contract-Dataset>
 
 ### Dependency
 
@@ -304,6 +309,13 @@ Continuously writing and updating...
 2. [TensorFlow Hub](https://tfhub.dev/)
 3. [Universal Sentence Encoder V4](https://tfhub.dev/google/universal-sentence-encoder/4)
 
+## Contributors
+
+- [Youwei Huang](https://www.devil.ren) – Project initiator, first author, and principal researcher  
+- [Sen Fang](https://tomasandersonfang.github.io/) – Model development, paper review, and principal researcher (model)
+
+
 ## Acknowledgment
 
 -   [Institute of Intelligent Computing Technology, Suzhou, CAS](http://iict.ac.cn/)
+-   [Macau University of Science and Technology](http://www.must.edu.mo)
