@@ -261,14 +261,20 @@ EXAMPLE: [embed](http://api.smart.cas-ll.cn/smartbert/embed) is used to convert 
 
 Continuously writing and updating...
 
+**Rsearch Track**:
+
 ```tex
-@article{huang2022deep,
+@inproceedings{huang2025deep,
   title={Deep smart contract intent detection},
-  author={Huang, Youwei and Fang, Sen and Li, Jianwen and Tao, Jiachun and Hu, Bin and Zhang, Tao},
-  journal={arXiv preprint arXiv:2211.10724},
-  year={2022}
+  author={Huang, Youwei and Fang, Sen and Li, Jianwen and Hu, Bin and Tao, Jiachun and Zhang, Tao},
+  booktitle={2025 IEEE International Conference on Software Analysis, Evolution and Reengineering (SANER)},
+  pages={124--135},
+  year={2025},
+  organization={IEEE}
 }
 ```
+
+**Tool Track**:
 
 ```tex
 @article{huang2022smartintentnn,

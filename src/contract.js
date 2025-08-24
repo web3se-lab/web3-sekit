@@ -171,7 +171,7 @@ async function tokenAll(start = 1, end) {
 // embed all, change to embed by foreaching table tokens
 async function embedAll(start = 1, end) {
     const max = end || (await $token.maxId())
-    const BATCH = 20
+    const BATCH = 100
     let ps = [] // multi threads request
     const pool = 'avg' // avg | max | cls | out
 
