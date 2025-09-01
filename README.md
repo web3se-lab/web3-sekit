@@ -263,9 +263,12 @@ EXAMPLE: [embed](http://api.smart.cas-ll.cn/smartbert/embed) is used to convert 
 
 ## Paper
 
-Continuously writing and updating...
-
-**Rsearch Track**:
+@article{huang2025smart,
+  title={Smart Contract Intent Detection with Pre-trained Programming Language Model},
+  author={Huang, Youwei and Li, Jianwen and Fang, Sen and Li, Yao and Yang, Peng and Hu, Bin and Zhang, Tao},
+  journal={arXiv preprint arXiv:2508.20086},
+  year={2025}
+}
 
 ```tex
 @inproceedings{huang2025deep,
@@ -278,8 +281,6 @@ Continuously writing and updating...
 }
 ```
 
-**Tool Track**:
-
 ```tex
 @article{huang2022smartintentnn,
   title={Smartintentnn: Towards smart contract intent detection},
@@ -288,6 +289,8 @@ Continuously writing and updating...
   year={2022}
 }
 ```
+
+Continuously writing and updating...
 
 ## Resource
 
