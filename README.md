@@ -8,7 +8,7 @@ The repo of **SmartIntentNN V2** is here: <https://github.com/web3se-lab/SmartIn
 
 To try our research tools online, please visit the following website:
 
-👉 <https://www.web3-se.com>
+👉 <https://web3se-lab.github.io/web3-sekit-vue/>
 
 ## Tookkit
 
@@ -43,12 +43,12 @@ To try our research tools online, please visit the following website:
 
 **Task:** Build a deep learning model to detect developers' unsafe intents in smart contracts.
 
-**Website:** <https://www.web3-se.com>
+**Website:** <https://web3se-lab.github.io/web3-sekit-vue/>
 
 **Technical Guide:**
 
 -   ⚙️ Frontend repository: <https://github.com/web3se-lab/web3-sekit-vue>
--   📱 Pages for testing the model online: [Detect](https://www.web3-se.com/), [Highlight](https://www.web3-se.com/highlight/), [Evaluate](https://www.web3-se.com/evaluate/)
+-   📱 Pages for testing the model online: [Detect](https://web3se-lab.github.io/web3-sekit-vue/), [Highlight](https://web3se-lab.github.io/web3-sekit-vue/highlight/), [Evaluate](https://web3se-lab.github.io/web3-sekit-vue/evaluate/)
 -   🕵️ Click **"Detect My Smart Contract"** to copy and detect your customized smart contract.
 -   🚀 Click **"Predict 🚀"** to detect the malicious intents in smart contracts.
 -   🌲 Click **"CCTree 🌲"** to view the smart contract code tree.
@@ -311,9 +311,8 @@ Continuously writing and updating...
 
 ## Contributors
 
-- [Youwei Huang](https://www.devil.ren) – Project initiator, first author, and principal researcher  
-- [Sen Fang](https://tomasandersonfang.github.io/) – Model development, paper review, and principal researcher (model)
-
+-   [Youwei Huang](https://www.devil.ren) – Project initiator, first author, and principal researcher
+-   [Sen Fang](https://tomasandersonfang.github.io/) – Model development, paper review, and principal researcher (model)
 
 ## Acknowledgment
 
