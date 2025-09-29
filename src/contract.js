@@ -197,7 +197,7 @@ async function embedAll(start = 1, end) {
                 .then(({ code, promise }) => promise.then(res => ({ code, res })))
                 .then(({ code, res }) => {
                     for (const i in code) for (const j in code[i]) code[i][j] = res[code[i][j]]
-                    return $contract.updateById({ Id: contractId, Embedding2: JSON.stringify(code) })
+                    return $contract.updateById({ Id: contractId, Embedding: JSON.stringify(code) })
                 })
                 .then(console.log('Updated'))
                 .catch(console.error)

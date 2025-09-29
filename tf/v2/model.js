@@ -152,6 +152,8 @@ module.exports = class MyModel {
     }
 
     async predict(id = 1, slice = 1) {
+        let startTime = Date.now()
+        let endTime = Date.now()
         console.log('==============================Predicting=================================')
         id = parseInt(id)
         slice = parseInt(slice)
@@ -173,11 +175,15 @@ module.exports = class MyModel {
                 id++
             }
             const tx = this.tf.tensor(this.padding(xs))
+            startTime = Date.now()
             const yp = this.label((await this.mymodel.executeAsync(tx)).arraySync())
+            endTime = Date.now()
             const ya = this.label(ys)
 
             console.log('Predict', yp)
             console.log('Actual', ya)
+            const duration = endTime - startTime
+            console.log(`Prediction completed in ${duration}ms (${(duration / 1000).toFixed(2)}s)`)
         } catch (e) {
             console.error(e)
         } finally {

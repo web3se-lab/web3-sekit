@@ -15,6 +15,7 @@ async function embed(req, res, next) {
 
         res.json(tree)
     } catch (e) {
+        console.error(e)
         next(e)
     }
 }
@@ -32,6 +33,7 @@ async function tokenize(req, res, next) {
 
         res.json(tree)
     } catch (e) {
+        console.error(e)
         next(e)
     }
 }
@@ -44,6 +46,7 @@ async function tree(req, res, next) {
         const data = $.getCodeMap($.clearCode($.multiContracts(code), type), type)
         res.json(data)
     } catch (e) {
+        console.error(e)
         next(e)
     }
 }

@@ -23,7 +23,7 @@ async function getSourceCodeScam(key) {
     const res = await TokenHasContract(
         key,
         ['Id', 'Scams'],
-        ['SourceCode', 'CompilerVersion', 'ContractAddress', 'Embedding2']
+        ['SourceCode', 'CompilerVersion', 'ContractAddress', 'Embedding']
     )
     if (!res) return null
 
@@ -32,7 +32,7 @@ async function getSourceCodeScam(key) {
     const codeTree = $.getCodeMap($.clearCode($.multiContracts(res.contract.SourceCode), type), type)
     const sourceCode = res.contract.SourceCode
     const address = res.contract.ContractAddress
-    const embedding = JSON.parse(res.contract.Embedding2)
+    const embedding = JSON.parse(res.contract.Embedding)
 
     if (process.argv[2] === 'code-scam') {
         console.log('Id', res.Id)
@@ -48,12 +48,12 @@ async function getSourceCodeVulnerability(key) {
     const res = await VulnerabilityHasContract(
         key,
         ['Id', 'Vulnerability', 'Dir', 'File', 'Detail', 'Repair'],
-        ['Id', 'SourceCode', 'Embedding2']
+        ['Id', 'SourceCode', 'Embedding']
     )
     if (!res) return null
 
     const vulnerability = JSON.parse(res.Vulnerability)
-    const embedding = JSON.parse(res.contract.Embedding2)
+    const embedding = JSON.parse(res.contract.Embedding)
     const sourceCode = res.contract.SourceCode
     const codeTree = null // $.getCodeMap($.clearCode($.multiContracts(res.contract.SourceCode)))
 
