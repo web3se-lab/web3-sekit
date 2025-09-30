@@ -8,7 +8,7 @@ The repo of **SmartIntentNN V2** is here: <https://github.com/web3se-lab/SmartIn
 
 To try our research tools online, please visit the following website:
 
-👉 <https://web3se-lab.github.io/web3-sekit-vue/>
+👉 <https://web3se-lab.github.io>
 
 ## Tookkit
 
@@ -43,12 +43,12 @@ To try our research tools online, please visit the following website:
 
 **Task:** Build a deep learning model to detect developers' unsafe intents in smart contracts.
 
-**Website:** <https://web3se-lab.github.io/web3-sekit-vue/>
+**Website:** <https://web3se-lab.github.io>
 
 **Technical Guide:**
 
--   ⚙️ Frontend repository: <https://github.com/web3se-lab/web3-sekit-vue>
--   📱 Pages for testing the model online: [Detect](https://web3se-lab.github.io/web3-sekit-vue/), [Highlight](https://web3se-lab.github.io/web3-sekit-vue/highlight/), [Evaluate](https://web3se-lab.github.io/web3-sekit-vue/evaluate/)
+-   ⚙️ Frontend repository: <https://github.com/web3se-lab>
+-   📱 Pages for testing the model online: [Detect](https://web3se-lab.github.io), [Highlight](https://web3se-lab.github.io/highlight/), [Evaluate](https://web3se-lab.github.io/evaluate/)
 -   🕵️ Click **"Detect My Smart Contract"** to copy and detect your customized smart contract.
 -   🚀 Click **"Predict 🚀"** to detect the malicious intents in smart contracts.
 -   🌲 Click **"CCTree 🌲"** to view the smart contract code tree.
@@ -266,7 +266,7 @@ EXAMPLE: [embed](http://api.smart.cas-ll.cn/smartbert/embed) is used to convert 
 ```tex
 @article{huang2025smart,
   title={Smart Contract Intent Detection with Pre-trained Programming Language Model},
-  author={Huang, Youwei and Li, Jianwen and Fang, Sen and Li, Yao and Yang, Peng and Hu, Bin and Zhang, Tao},
+  author={Huang, Youwei and Li, Jianwen and Fang, Sen and Li, Yao and Yang, Peng and Hu, Bin},
   journal={arXiv preprint arXiv:2508.20086},
   year={2025}
 }
