@@ -31,7 +31,6 @@
     "bugs": {
         "url": "https://github.com/web3se-lab/web3-sekit/issues"
     },
-    "homepage": "https://www.web3-se.com",
     "devDependencies": {
         "@types/bluebird": "^3.5.42",
         "@types/serve-index": "^1.9.1",
