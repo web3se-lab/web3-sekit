@@ -1,15 +1,16 @@
 const { findOneByPk, findOneByAddress } = require('../db/contract')
 
-async function get(req, res, next) {
+async function get(request, reply) {
     try {
-        const key = req.body.key
+        const key = request.body?.key || request.query?.key
         const attrs = ['Id', 'ContractName', 'ContractAddress', 'Network', 'SourceCode', 'CompilerVersion', 'ABI']
         let data
         if (!data) data = await findOneByAddress(key, attrs)
         if (!data) data = await findOneByPk(key, attrs)
-        res.json(data)
+        return reply.send(data)
     } catch (e) {
-        next(e)
+        console.error(e)
+        return reply.code(500).send({ error: e.message })
     }
 }
 

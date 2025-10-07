@@ -15,35 +15,40 @@ const TOKEN = process.env.UNIAI_TOKEN
 const PROVIDER = process.env.PROVIDER
 const MODEL = process.env.MODEL
 
-async function config(_, res) {
+async function config(request, reply) {
     try {
         const conf = CONF
-        res.json({ status: 1, data: conf, msg: 'success to list config' })
+        return reply.send({ status: 1, data: conf, msg: 'success to list config' })
     } catch (e) {
         console.error(e)
-        res.json({ status: 0, msg: e.message })
+        return reply.send({ status: 0, msg: e.message })
     }
 }
 
-async function download(req, res, next) {
+async function download(request, reply) {
     try {
-        const file = req.body.file
+        const file = request.body?.file || request.query?.file
         const path = `${ROOT}/static/contract/${file}.sol`
-        res.sendFile(path, { headers: { 'Content-Disposition': `attachment; filename="${file}.sol"` } })
+        return reply.sendFile(path, { headers: { 'Content-Disposition': `attachment; filename="${file}.sol"` } })
     } catch (e) {
         console.error(e)
-        next(e)
+        return reply.code(500).send({ error: e.message })
     }
 }
 
-async function generate(req, res) {
+async function generate(request, reply) {
     try {
-        res.setHeader('Content-Type', 'text/event-stream')
-        res.setHeader('Cache-Control', 'no-cache')
-        res.setHeader('Connection', 'keep-alive')
+        reply.header('Content-Type', 'text/event-stream')
+        reply.header('Cache-Control', 'no-cache')
+        reply.header('Connection', 'keep-alive')
 
-        const { title, type, pragma, description, params } = req.body
-        const chunk = req.body.chunk || false
+        // Get data from body (POST) or query (GET)
+        const title = request.body?.title || request.query?.title
+        const type = request.body?.type || request.query?.type
+        const pragma = request.body?.pragma || request.query?.pragma
+        const description = request.body?.description || request.query?.description
+        const params = request.body?.params || request.query?.params
+        const chunk = request.body?.chunk || request.query?.chunk || false
         if (!title) throw new Error('no title')
         if (!type) throw new Error('no contract type')
         if (!pragma) throw new Error('no pragma version')

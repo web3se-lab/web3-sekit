@@ -51,44 +51,44 @@ const handleMVCRoute = async (request, reply) => {
     try {
         const { controller: ctl, action: act } = request.params
 
-        if (!ctl || !act) return reply.code(404).send({ error: 'Route not found' })
+        if (!ctl || !act) {
+            return reply.code(404).send({ error: 'Route not found' })
+        }
 
-        // Convert GET query parameters to body for compatibility
-        if (request.method === 'GET') request.body = request.query || {}
+        // Handle multipart/form-data for file uploads
+        if (request.isMultipart && request.isMultipart()) {
+            const parts = request.parts()
+            const body = {}
+            const files = {}
+            
+            for await (const part of parts) {
+                if (part.file) {
+                    // Handle file uploads
+                    const buffer = await part.toBuffer()
+                    files[part.fieldname] = {
+                        filename: part.filename,
+                        mimetype: part.mimetype,
+                        buffer: buffer,
+                        size: buffer.length
+                    }
+                } else {
+                    // Handle regular form fields
+                    body[part.fieldname] = part.value
+                }
+            }
+            
+            request.body = { ...request.body, ...body }
+            request.files = files
+        }
 
         // Load controller and execute action
         const controller = require(CTRL + ctl)
-        if (typeof controller[act] !== 'function') return reply.code(404).send({ error: 'Action not found' })
-
-        // Create Express-like req/res objects for compatibility
-        const path = `/${ctl}/${act}`
-        const req = {
-            ...request,
-            path: path,
-            method: request.method,
-            body: request.body,
-            query: request.query,
-            params: request.params,
-            headers: request.headers
+        if (typeof controller[act] !== 'function') {
+            return reply.code(404).send({ error: 'Action not found' })
         }
 
-        const res = {
-            send: data => reply.send(data),
-            json: data => reply.send(data),
-            status: code => reply.code(code),
-            header: (name, value) => reply.header(name, value),
-            sendStatus: code => reply.code(code).send(),
-            end: () => reply.send()
-        }
-
-        const next = error => {
-            if (error) {
-                console.error(error)
-                reply.code(500).send({ error: error.message })
-            }
-        }
-
-        await controller[act](req, res, next)
+        // Call controller action directly with Fastify request/reply
+        await controller[act](request, reply)
     } catch (e) {
         console.error(e)
         reply.code(500).send({ error: e.message })

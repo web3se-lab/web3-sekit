@@ -7,9 +7,9 @@ const $ = require('../src/utils')
 const EVA_PATH = `${ROOT}/tf/evaluates`
 
 // get code content from DB
-async function get(req, res, next) {
+async function get(req, res) {
     try {
-        const key = req.body.key
+        const key = req.body?.key || req.query?.key
         let data
         const attrs = ['Id', 'ContractName', 'ContractAddress', 'Network', 'SourceCode', 'CompilerVersion', 'ABI']
         if (!key) data = { maxId: await $contract.maxId(), count: await $contract.count() }
@@ -17,55 +17,59 @@ async function get(req, res, next) {
         else data = await $contract.findOneByPk(key, attrs)
         if (!data) throw new Error(`${key} not found`)
         const type = data.CompilerVersion.includes('vyper') ? 'vyper' : 'solidity'
-        res.json({
+        res.send({
             Type: type,
             CodeTree: $.getCodeMap($.clearCode($.multiContracts(data.SourceCode), type), type),
             ...data.dataValues
         })
     } catch (e) {
-        next(e)
+        console.error(e)
+        return res.code(500).send({ error: e.message })
     }
 }
 
 // smart contract to embedding
-async function embedding(req, res, next) {
+async function embedding(req, res) {
     try {
-        const text = req.body.text
-        const type = req.body.type || 'solidity'
-        res.json({ Embedding: await embed($.getCodeMap($.clearCode($.multiContracts(text), type), type)) })
+        const text = req.body?.text
+        const type = req.body?.type || 'solidity'
+        res.send({ Embedding: await embed($.getCodeMap($.clearCode($.multiContracts(text), type), type)) })
     } catch (e) {
-        next(e)
+        console.error(e)
+        return res.code(500).send({ error: e.message })
     }
 }
 
 // get code with risk array
-async function intent(req, res, next) {
+async function intent(req, res) {
     try {
-        const key = req.body.key // key is for token table
+        const key = req.body?.key || req.query?.key
         const data = await $data.getSourceCodeScam(key)
         if (!data) throw new Error(`${key} not found`)
-        return res.json(data)
+        return res.send(data)
     } catch (e) {
-        next(e)
+        console.error(e)
+        return res.code(500).send({ error: e.message })
     }
 }
 
-async function vulnerability(req, res, next) {
+async function vulnerability(req, res) {
     try {
-        const key = req.body.key // key is for token table
+        const key = req.body?.key || req.query?.key
         const data = await $data.getSourceCodeVulnerability(key)
         if (!data) throw new Error(`${key} not found`)
-        return res.json(data)
+        return res.send(data)
     } catch (e) {
-        next(e)
+        console.error(e)
+        return res.code(500).send({ error: e.message })
     }
 }
 
 // get evaluation result data
-async function evaluate(req, res, next) {
+async function evaluate(req, res) {
     try {
-        const index = req.body.index
-        const version = parseInt(req.body.version)
+        const index = req.body?.index || req.query?.index || 0
+        const version = parseInt(req.body?.version || req.query?.version)
         const data = []
         if (!version) {
             // classic models, denote by v0
@@ -87,9 +91,10 @@ async function evaluate(req, res, next) {
             data.push({ title: 'SmartBERT + BiLSTM', data: `v${version}/smartbert_bilstm_js.json` })
         }
 
-        return res.json({ title: data[index].title, data: $.loadJson(`${EVA_PATH}/${data[index].data}`) })
+        return res.send({ title: data[index].title, data: $.loadJson(`${EVA_PATH}/${data[index].data}`) })
     } catch (e) {
-        next(e)
+        console.error(e)
+        return res.code(500).send({ error: e.message })
     }
 }
 
