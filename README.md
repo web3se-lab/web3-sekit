@@ -47,7 +47,7 @@ To try our research tools online, please visit the following website:
 
 **Technical Guide:**
 
--   ⚙️ Frontend repository: <https://github.com/web3se-lab>
+-   ⚙️ Frontend repository: <https://github.com/web3se-lab/web3se-lab.github.io>
 -   📱 Pages for testing the model online: [Detect](https://web3se-lab.github.io), [Highlight](https://web3se-lab.github.io/highlight/), [Evaluate](https://web3se-lab.github.io/evaluate/)
 -   🕵️ Click **"Detect My Smart Contract"** to copy and detect your customized smart contract.
 -   🚀 Click **"Predict 🚀"** to detect the malicious intents in smart contracts.
