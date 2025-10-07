@@ -1,6 +1,9 @@
 require('dotenv').config()
 const Sequelize = require('sequelize')
+const { once } = require('events')
 const Model = require('./Model')
+
+const DEFAULT_BATCH_SIZE = 1000
 
 function pool() {
     const env = process.env
@@ -66,63 +69,47 @@ function model() {
 async function exportTable(tableName, options = {}) {
     try {
         const {
-            includeFields = null, // 包含的字段数组，如果为null则包含所有字段
-            excludeFields = [], // 排除的字段数组
-            where = {}, // 查询条件
-            limit = null, // 限制导出记录数
-            format = 'json' // 导出格式: 'json', 'csv', 'sql'
+            includeFields = null,
+            excludeFields = [],
+            where = {},
+            limit = null,
+            format = 'json',
+            streamTo = null,
+            batchSize = DEFAULT_BATCH_SIZE
         } = options
 
         await connect()
         const models = model()
+        const { tableModel, tableSchema, fields } = prepareTableContext(models, tableName, includeFields, excludeFields)
 
-        if (!models[tableName]) {
-            throw new Error(`Table ${tableName} not found`)
+        const lowerFormat = format.toLowerCase()
+        if (lowerFormat === 'csv' && streamTo) {
+            return await exportTableCsvStream({
+                tableName,
+                tableModel,
+                tableSchema,
+                fields,
+                where,
+                limit,
+                stream: streamTo,
+                batchSize
+            })
         }
 
         console.log(`Exporting table: ${tableName}`)
 
-        // 获取表结构
-        const tableSchema = Model[tableName]
-        const structure = {
-            name: tableSchema.name,
-            fields: {},
-            options: tableSchema.options
-        }
-
-        // 处理字段结构
-        for (const fieldName in tableSchema.table) {
-            const field = tableSchema.table[fieldName]
-            structure.fields[fieldName] = {
-                type: field.type ? field.type.toString() : 'UNKNOWN',
-                allowNull: field.allowNull !== false,
-                defaultValue: field.defaultValue,
-                primaryKey: field.primaryKey || false,
-                autoIncrement: field.autoIncrement || false,
-                unique: field.unique || false
-            }
-        }
-
-        // 构建查询选项
+        const structure = buildTableStructure(tableSchema)
         const queryOptions = {
             where,
-            raw: true
+            raw: true,
+            attributes: fields
         }
 
         if (limit) {
             queryOptions.limit = limit
         }
 
-        // 处理字段选择
-        if (includeFields && Array.isArray(includeFields)) {
-            queryOptions.attributes = includeFields.filter(field => !excludeFields.includes(field))
-        } else if (excludeFields.length > 0) {
-            const allFields = Object.keys(tableSchema.table)
-            queryOptions.attributes = allFields.filter(field => !excludeFields.includes(field))
-        }
-
-        // 获取数据
-        const data = await models[tableName].findAll(queryOptions)
+        const data = await tableModel.findAll(queryOptions)
 
         console.log(`Found ${data.length} records`)
 
@@ -131,16 +118,16 @@ async function exportTable(tableName, options = {}) {
             data,
             meta: {
                 tableName,
+                tableDisplayName: tableSchema.name,
                 recordCount: data.length,
                 exportTime: new Date().toISOString(),
-                fields: queryOptions.attributes || Object.keys(tableSchema.table),
+                fields,
                 excludedFields: excludeFields,
                 queryConditions: where
             }
         }
 
-        // 根据格式导出
-        switch (format.toLowerCase()) {
+        switch (lowerFormat) {
             case 'json':
                 return formatAsJson(result)
             case 'csv':
@@ -154,6 +141,135 @@ async function exportTable(tableName, options = {}) {
         console.error('Export error:', error)
         throw error
     }
+}
+
+function prepareTableContext(models, tableName, includeFields, excludeFields) {
+    if (!models[tableName]) {
+        throw new Error(`Table ${tableName} not found`)
+    }
+
+    const tableSchema = Model[tableName]
+    const allFields = Object.keys(tableSchema.table)
+
+    let fields
+    if (includeFields && Array.isArray(includeFields) && includeFields.length) {
+        fields = includeFields.filter(field => allFields.includes(field) && !excludeFields.includes(field))
+    } else if (excludeFields && excludeFields.length) {
+        fields = allFields.filter(field => !excludeFields.includes(field))
+    } else {
+        fields = allFields
+    }
+
+    if (!fields.length) {
+        throw new Error(`No fields selected for export on table ${tableName}`)
+    }
+
+    return {
+        tableModel: models[tableName],
+        tableSchema,
+        fields
+    }
+}
+
+function buildTableStructure(tableSchema) {
+    const structure = {
+        name: tableSchema.name,
+        fields: {},
+        options: tableSchema.options
+    }
+
+    for (const fieldName in tableSchema.table) {
+        const field = tableSchema.table[fieldName]
+        structure.fields[fieldName] = {
+            type: field.type ? field.type.toString() : 'UNKNOWN',
+            allowNull: field.allowNull !== false,
+            defaultValue: field.defaultValue,
+            primaryKey: field.primaryKey || false,
+            autoIncrement: field.autoIncrement || false,
+            unique: field.unique || false
+        }
+    }
+
+    return structure
+}
+
+async function exportTableCsvStream({
+    tableName,
+    tableModel,
+    tableSchema,
+    fields,
+    where,
+    limit,
+    stream,
+    batchSize = DEFAULT_BATCH_SIZE
+}) {
+    const hasLimit = typeof limit === 'number' && limit >= 0
+    const targetCount = hasLimit ? limit : Infinity
+    let totalRows = 0
+    let offset = 0
+    const effectiveBatchSize = batchSize > 0 ? batchSize : DEFAULT_BATCH_SIZE
+
+    await writeLine(stream, fields.join(','))
+
+    while (totalRows < targetCount) {
+        const remaining = targetCount - totalRows
+        const currentLimit = hasLimit ? Math.min(effectiveBatchSize, remaining) : effectiveBatchSize
+        if (hasLimit && currentLimit <= 0) break
+
+        const rows = await tableModel.findAll({
+            where,
+            raw: true,
+            attributes: fields,
+            offset,
+            limit: currentLimit
+        })
+
+        if (!rows.length) break
+
+        for (const row of rows) {
+            const values = fields.map(field => formatCsvValue(row[field]))
+            await writeLine(stream, values.join(','))
+        }
+
+        totalRows += rows.length
+        offset += rows.length
+
+        if (rows.length < currentLimit) break
+    }
+
+    return {
+        rowsWritten: totalRows,
+        meta: {
+            tableName,
+            tableDisplayName: tableSchema.name,
+            fields,
+            exportTime: new Date().toISOString(),
+            limit,
+            batchSize: effectiveBatchSize
+        }
+    }
+}
+
+async function writeLine(stream, line) {
+    if (!stream.write(`${line}\n`)) {
+        await once(stream, 'drain')
+    }
+}
+
+function formatCsvValue(value) {
+    if (value === null || value === undefined) return ''
+
+    if (typeof value === 'object') {
+        value = JSON.stringify(value)
+    }
+
+    if (typeof value === 'string') {
+        const needsEscaping = /[",\n\r]/.test(value)
+        const escaped = value.replace(/"/g, '""')
+        return needsEscaping ? `"${escaped}"` : escaped
+    }
+
+    return value
 }
 
 // Format as JSON
@@ -175,17 +291,7 @@ function formatAsCsv(result) {
 
     // Add data rows
     result.data.forEach(row => {
-        const values = headers.map(header => {
-            const value = row[header]
-            if (value === null || value === undefined) {
-                return ''
-            }
-            // Escape quotes and wrap in quotes if contains comma
-            if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
-                return '"' + value.replace(/"/g, '""') + '"'
-            }
-            return value
-        })
+        const values = headers.map(header => formatCsvValue(row[header]))
         csvLines.push(values.join(','))
     })
 
@@ -264,15 +370,39 @@ if (process.argv[1].includes('DB')) {
             } else if (arg.startsWith('--format=')) {
                 options.format = arg.split('=')[1]
             } else if (arg.startsWith('--limit=')) {
-                options.limit = parseInt(arg.split('=')[1])
+                options.limit = parseInt(arg.split('=')[1], 10)
+            } else if (arg.startsWith('--batchSize=')) {
+                options.batchSize = parseInt(arg.split('=')[1], 10)
+            } else if (arg.startsWith('--batch=')) {
+                options.batchSize = parseInt(arg.split('=')[1], 10)
             }
         }
 
-        exportTable(tableName, options)
-            .then(result => {
-                console.log('\n' + result)
-            })
-            .catch(console.error)
+        if (Number.isNaN(options.limit)) delete options.limit
+        if (Number.isNaN(options.batchSize)) delete options.batchSize
+
+        const format = (options.format || 'json').toLowerCase()
+
+        if (format === 'csv') {
+            exportTable(tableName, { ...options, streamTo: process.stdout })
+                .then(summary => {
+                    const rows = summary ? summary.rowsWritten : 0
+                    console.error(`\nExported ${rows} rows from ${tableName}`)
+                })
+                .catch(error => {
+                    console.error(error)
+                    process.exitCode = 1
+                })
+        } else {
+            exportTable(tableName, options)
+                .then(result => {
+                    console.log('\n' + result)
+                })
+                .catch(error => {
+                    console.error(error)
+                    process.exitCode = 1
+                })
+        }
     }
 }
 

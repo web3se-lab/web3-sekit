@@ -20,11 +20,7 @@ async function VulnerabilityHasContract(id, attributes, contractAttr) {
 
 // get scam intent with source code
 async function getSourceCodeScam(key) {
-    const res = await TokenHasContract(
-        key,
-        ['Id', 'Scams'],
-        ['SourceCode', 'CompilerVersion', 'ContractAddress', 'Embedding']
-    )
+    const res = await TokenHasContract(key, ['Id', 'Scams'], ['SourceCode', 'CompilerVersion', 'ContractAddress'])
     if (!res) return null
 
     const risk = JSON.parse(res.Scams)
@@ -32,7 +28,6 @@ async function getSourceCodeScam(key) {
     const codeTree = $.getCodeMap($.clearCode($.multiContracts(res.contract.SourceCode), type), type)
     const sourceCode = res.contract.SourceCode
     const address = res.contract.ContractAddress
-    const embedding = JSON.parse(res.contract.Embedding)
 
     if (process.argv[2] === 'code-scam') {
         console.log('Id', res.Id)
@@ -40,7 +35,7 @@ async function getSourceCodeScam(key) {
         console.log('Scams', risk)
     }
 
-    return { id: res.Id, sourceCode, risk, type, address, codeTree, embedding }
+    return { id: res.Id, sourceCode, risk, type, address, codeTree }
 }
 
 // get vulnerability with source code
@@ -48,14 +43,13 @@ async function getSourceCodeVulnerability(key) {
     const res = await VulnerabilityHasContract(
         key,
         ['Id', 'Vulnerability', 'Dir', 'File', 'Detail', 'Repair'],
-        ['Id', 'SourceCode', 'Embedding']
+        ['Id', 'SourceCode']
     )
     if (!res) return null
 
     const vulnerability = JSON.parse(res.Vulnerability)
-    const embedding = JSON.parse(res.contract.Embedding)
     const sourceCode = res.contract.SourceCode
-    const codeTree = null // $.getCodeMap($.clearCode($.multiContracts(res.contract.SourceCode)))
+    const codeTree = $.getCodeMap($.clearCode($.multiContracts(res.contract.SourceCode)))
 
     if (process.argv[2] === 'code-vul') {
         console.log('Id', res.Id)
@@ -70,8 +64,7 @@ async function getSourceCodeVulnerability(key) {
         vulnerability,
         dir: res.Dir,
         detail: res.Detail,
-        repair: res.Repair,
-        embedding
+        repair: res.Repair
     }
 }
 
