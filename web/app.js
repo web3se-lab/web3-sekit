@@ -1,8 +1,8 @@
 require('dotenv').config()
 
 const fastify = require('fastify')({
-    logger: false,
-    bodyLimit: 10 * 1024 * 1024 // 10MB limit
+    logger: true,
+    bodyLimit: 5 * 1024 * 1024 // 10MB limit
 })
 const ROOT = require('app-root-path')
 
@@ -60,7 +60,7 @@ const handleMVCRoute = async (request, reply) => {
             const parts = request.parts()
             const body = {}
             const files = {}
-            
+
             for await (const part of parts) {
                 if (part.file) {
                     // Handle file uploads
@@ -76,7 +76,7 @@ const handleMVCRoute = async (request, reply) => {
                     body[part.fieldname] = part.value
                 }
             }
-            
+
             request.body = { ...request.body, ...body }
             request.files = files
         }

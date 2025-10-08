@@ -13,13 +13,14 @@ const nn = new Model('smartbert_bilstm_js')
 async function get(req, res) {
     try {
         const key = req.body?.key || req.query?.key
+        if (!key) return res.send({ maxId: await $contract.maxId(), count: await $contract.count() })
+
         let data
         const attrs = ['Id', 'ContractName', 'ContractAddress', 'Network', 'SourceCode', 'CompilerVersion']
-        if (!key) data = { maxId: await $contract.maxId(), count: await $contract.count() }
-        else if (key.substr(0, 2) === '0x') data = await $contract.findOneByAddress(key, attrs)
-        else data = await $contract.findOneByPk(key, attrs)
+        if (key.substr(0, 2) === '0x') data = await $contract.findOneByAddress(key, attrs)
+        else data = await $contract.findOneByPk(parseInt(key), attrs)
         if (!data) throw new Error(`${key} not found`)
-        const type = data.CompilerVersion.includes('vyper') ? 'vyper' : 'solidity'
+        const type = data.CompilerVersion?.includes('vyper') ? 'vyper' : 'solidity'
         res.send({
             Type: type,
             CodeTree: $.getCodeMap($.clearCode($.multiContracts(data.SourceCode), type), type),
@@ -47,6 +48,8 @@ async function embedding(req, res) {
 async function intent(req, res) {
     try {
         const key = req.body?.key || req.query?.key
+        if (!key) throw new Error('Key is required')
+
         const data = await $data.getSourceCodeScam(key)
         if (!data) throw new Error(`${key} not found`)
         return res.send(data)
@@ -59,6 +62,8 @@ async function intent(req, res) {
 async function vulnerability(req, res) {
     try {
         const key = req.body?.key || req.query?.key
+        if (!key) throw new Error('Key is required')
+
         const data = await $data.getSourceCodeVulnerability(key)
         if (!data) throw new Error(`${key} not found`)
         return res.send(data)
@@ -70,18 +75,19 @@ async function vulnerability(req, res) {
 
 async function predict(req, res) {
     try {
-        const starttime = Date.now()
         if (!nn.mymodel) await nn.loadModel()
         const code = req.body.code
         const type = req.body.type || 'solidity'
+        if (!code.trim()) throw new Error('Param code is empty')
+
         const tree = $.getCodeMap($.clearCode($.multiContracts(code), type), type)
         const data = []
         for (const i in tree) for (const j in tree[i]) tree[i][j] = data.push(tree[i][j]) - 1
-        const result = await embedAPI(data)
+        const xs = await embedAPI(data)
 
-        const xs = [result]
-        const tx = nn.tf.tensor(nn.padding(xs))
-        const yp = (await nn.mymodel.executeAsync(tx)).arraySync()
+        const tx = nn.tf.tensor(nn.padding([xs]))
+        const ty = await nn.mymodel.predictAsync(tx)
+        const yp = ty.arraySync()
         const results = []
         for (const i in yp)
             for (const j in yp[i])
