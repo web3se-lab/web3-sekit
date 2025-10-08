@@ -11,7 +11,7 @@ async function get(req, res) {
     try {
         const key = req.body?.key || req.query?.key
         let data
-        const attrs = ['Id', 'ContractName', 'ContractAddress', 'Network', 'SourceCode', 'CompilerVersion', 'ABI']
+        const attrs = ['Id', 'ContractName', 'ContractAddress', 'Network', 'SourceCode', 'CompilerVersion']
         if (!key) data = { maxId: await $contract.maxId(), count: await $contract.count() }
         else if (key.substr(0, 2) === '0x') data = await $contract.findOneByAddress(key, attrs)
         else data = await $contract.findOneByPk(key, attrs)
@@ -91,6 +91,7 @@ async function evaluate(req, res) {
             data.push({ title: 'SmartBERT + BiLSTM', data: `v${version}/smartbert_bilstm_js.json` })
         }
 
+        if (!data[index]) return res.send(null)
         return res.send({ title: data[index].title, data: $.loadJson(`${EVA_PATH}/${data[index].data}`) })
     } catch (e) {
         console.error(e)

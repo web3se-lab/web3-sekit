@@ -20,7 +20,11 @@ async function VulnerabilityHasContract(id, attributes, contractAttr) {
 
 // get scam intent with source code
 async function getSourceCodeScam(key) {
-    const res = await TokenHasContract(key, ['Id', 'Scams'], ['SourceCode', 'CompilerVersion', 'ContractAddress'])
+    const res = await TokenHasContract(
+        key,
+        ['Id', 'Scams'],
+        ['SourceCode', 'CompilerVersion', 'ContractAddress', 'Network']
+    )
     if (!res) return null
 
     const risk = JSON.parse(res.Scams)
@@ -35,7 +39,7 @@ async function getSourceCodeScam(key) {
         console.log('Scams', risk)
     }
 
-    return { id: res.Id, sourceCode, risk, type, address, codeTree }
+    return { id: res.Id, sourceCode, risk, type, address, codeTree, network: res.contract.Network }
 }
 
 // get vulnerability with source code

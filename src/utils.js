@@ -8,6 +8,7 @@ const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker')
 puppeteer.use(AdblockerPlugin({ blockTrackers: true }))
 const fetch = require('node-fetch')
 const querystring = require('querystring')
+const parser = require('@solidity-parser/parser')
 
 const utils = {
     async get(url, params = {}, headers = {}) {
@@ -174,9 +175,57 @@ const utils = {
         for (const i in sources) code += sources[i].content // merge
         return code
     },
+
+    getCodeTree(source) {
+        const ast = parser.parse(source, { range: true, tolerant: true })
+
+        const result = {}
+
+        for (const node of ast.children) {
+            // 只处理合约/接口/库定义
+            if (node.type === 'ContractDefinition') {
+                const name = node.name || '(anonymous)'
+
+                // 顶层键为合约名
+                result[name] = {}
+
+                // 遍历function-level节点
+                for (const sub of node.subNodes) {
+                    let code = ''
+                    let key = ''
+
+                    switch (sub.type) {
+                        case 'FunctionDefinition': {
+                            const isConstructor = sub.isConstructor === true
+                            key = isConstructor ? 'constructor' : sub.name || '(anonymous)'
+                            code = source.slice(sub.range[0], sub.range[1] + 1)
+                            break
+                        }
+                        case 'EventDefinition': {
+                            key = sub.name || '(anonymous)'
+                            code = source.slice(sub.range[0], sub.range[1] + 1)
+                            break
+                        }
+                        case 'ModifierDefinition': {
+                            key = sub.name || '(anonymous)'
+                            code = source.slice(sub.range[0], sub.range[1] + 1)
+                            break
+                        }
+                        default:
+                            continue
+                    }
+
+                    if (key && code) result[name][key] = code
+                }
+            }
+        }
+
+        return result
+    },
+
     // Solidity->contracts->functions
     getCodeMap(sourceCode, type = 'solidity') {
-        if (type === 'solidity') return this.getCodeMapSolidity(sourceCode)
+        if (type === 'solidity') return this.getCodeTree(sourceCode)
         else if (type === 'vyper') return this.getCodeMapVyper(sourceCode)
     },
     getCodeMapSolidity(sourceCode) {
