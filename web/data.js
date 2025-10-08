@@ -2,9 +2,12 @@ const ROOT = require('app-root-path')
 const $data = require('../db/data')
 const $contract = require('../db/contract')
 const { embed } = require('../tf/modules/embedding')
+const { embedAPI } = require('../tf/utils')
 const $ = require('../src/utils')
+const Model = require('../tf/v2/model')
 
 const EVA_PATH = `${ROOT}/tf/evaluates`
+const nn = new Model('smartbert_bilstm_js')
 
 // get code content from DB
 async function get(req, res) {
@@ -65,6 +68,32 @@ async function vulnerability(req, res) {
     }
 }
 
+async function predict(req, res) {
+    try {
+        const starttime = Date.now()
+        if (!nn.mymodel) await nn.loadModel()
+        const code = req.body.code
+        const type = req.body.type || 'solidity'
+        const tree = $.getCodeMap($.clearCode($.multiContracts(code), type), type)
+        const data = []
+        for (const i in tree) for (const j in tree[i]) tree[i][j] = data.push(tree[i][j]) - 1
+        const result = await embedAPI(data)
+
+        const xs = [result]
+        const tx = nn.tf.tensor(nn.padding(xs))
+        const yp = (await nn.mymodel.executeAsync(tx)).arraySync()
+        const results = []
+        for (const i in yp)
+            for (const j in yp[i])
+                for (const k in nn.TYPE) if (nn.TYPE[k] == j) results.push({ type: k, score: yp[i][j] })
+
+        return res.send({ results })
+    } catch (e) {
+        console.error(e)
+        return res.code(500).send({ error: e.message })
+    }
+}
+
 // get evaluation result data
 async function evaluate(req, res) {
     try {
@@ -99,4 +128,4 @@ async function evaluate(req, res) {
     }
 }
 
-module.exports = { get, embedding, evaluate, intent, vulnerability }
+module.exports = { get, embedding, evaluate, intent, vulnerability, predict }
