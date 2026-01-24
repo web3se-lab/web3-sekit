@@ -2,23 +2,19 @@
 
 🤩 We are building a comprehensive toolkit for **Software Engineering of Web3**.
 
-The repo of **SmartIntentNN V2** is here: <https://github.com/web3se-lab/SmartIntent-py>
-
-## Online
-
 To try our research tools online, please visit the following website:
 
 👉 <https://web3se-lab.github.io>
 
-## Tookkit
+## Toolkit
 
 **Tags: Web3, AI, Software Engineering**
 
--   🕸️ Web3 Data Crawler
--   🤔 Web3 Data Collection, Labelling, and Analysis
--   🚀 Build, Train, and Evaluate AI Models
--   👀 Data Visualization
--   🤝 Blockchain Network Interactions
+- 🕸️ Web3 Data Crawler
+- 🤔 Web3 Data Collection, Labelling, and Analysis
+- 🚀 Build, Train, and Evaluate AI Models
+- 👀 Data Visualization
+- 🤝 Blockchain Network Interactions
 
 ### Project-1: SmartBERT
 
@@ -30,10 +26,10 @@ To try our research tools online, please visit the following website:
 
 **Technical Points:**
 
--   Convert **smart contract** code context to vectors.
--   Built with **BERT/RoBERTa**-based pre-training models.
--   MLM-trained on **16,000+** (V2) real smart contracts.
--   Serving APIs: [tokenize](http://api.smart.cas-ll.cn/smartbert/tokenize), [embed](http://api.smart.cas-ll.cn/smartbert/embed), [code tree](http://api.smart.cas-ll.cn/smartbert/tree).
+- Convert **smart contract** code context to vectors.
+- Built with **BERT/RoBERTa**-based pre-training models.
+- MLM-trained on **16,000+** (V2) real smart contracts.
+- Serving APIs: [tokenize](http://api.smart.cas-ll.cn/smartbert/tokenize), [embed](http://api.smart.cas-ll.cn/smartbert/embed), [code tree](http://api.smart.cas-ll.cn/smartbert/tree).
 
 ### Project-2: SmartIntentNN
 
@@ -47,19 +43,19 @@ To try our research tools online, please visit the following website:
 
 **Technical Guide:**
 
--   ⚙️ Frontend repository: <https://github.com/web3se-lab/web3se-lab.github.io>
--   📱 Pages for testing the model online: [Detect](https://web3se-lab.github.io), [Highlight](https://web3se-lab.github.io/highlight/), [Evaluate](https://web3se-lab.github.io/evaluate/)
--   🕵️ Click **"Detect My Smart Contract"** to copy and detect your customized smart contract.
--   🚀 Click **"Predict 🚀"** to detect the malicious intents in smart contracts.
--   🌲 Click **"CCTree 🌲"** to view the smart contract code tree.
+- ⚙️ Frontend repository: <https://github.com/web3se-lab/web3se-lab.github.io>
+- 📱 Pages for testing the model online: [Detect](https://web3se-lab.github.io), [Highlight](https://web3se-lab.github.io/highlight/), [Evaluate](https://web3se-lab.github.io/evaluate/)
+- 🕵️ Click **"Detect My Smart Contract"** to copy and detect your customized smart contract.
+- 🚀 Click **"Predict 🚀"** to detect the malicious intents in smart contracts.
+- 🌲 Click **"CCTree 🌲"** to view the smart contract code tree.
 
 **Technical Points:**
 
--   SmartIntentNN V1.0 is trained and evaluated on **Tensorflow.js**.
--   SmartIntentNN V1.0 employs a **Universal Sentence Encoder** to generate smart contract embeddings.
--   The intent highlight model is trained using **K-means clustering**.
--   SmartIntentNN V2.0 will integrate **SmartBERT** to embed smart contracts.
--   SmartIntentNN V2.0 is currently under writing. Stay tuned! (Maybe meet in ICSE2026).
+- SmartIntentNN V1.0 is trained and evaluated on **Tensorflow.js**.
+- SmartIntentNN V1.0 employs a **Universal Sentence Encoder** to generate smart contract embeddings.
+- The intent highlight model is trained using **K-means clustering**.
+- SmartIntentNN V2.0 will integrate **SmartBERT** to embed smart contracts.
+- SmartIntentNN V2.0 is currently under writing. Stay tuned! (Maybe meet in ICSE2026).
 
 ## Dataset
 
@@ -117,9 +113,9 @@ Ground truth label distribution for Vulnerability data:
 
 🤖 Acces **SmartIntentNN V1.0** models: <https://github.com/web3se-lab/web3-sekit-vue/releases/tag/V1>
 
--   Download `v1.zip`, then unzip and move them to `/tf/models/v1/`.
--   For **Universal Sentence Encoder**, download <https://tfhub.dev/google/universal-sentence-encoder/4>, then move it to `/tf/models/` and rename the dir as `universal-sentence-encoder`.
--   For **K-means intent highlight model**, download `kmeans-model.json`, then move it to `/tf/models/kmeans-model.json`.
+- Download `v1.zip`, then unzip and move them to `/tf/models/v1/`.
+- For **Universal Sentence Encoder**, download <https://tfhub.dev/google/universal-sentence-encoder/4>, then move it to `/tf/models/` and rename the dir as `universal-sentence-encoder`.
+- For **K-means intent highlight model**, download `kmeans-model.json`, then move it to `/tf/models/kmeans-model.json`.
 
 The structure of directory should be like the following figure:
 
@@ -127,10 +123,10 @@ The structure of directory should be like the following figure:
 
 How to run these models in Tensorflow.js?
 
--   To predict: `node tf/v1/use-high-bilstm-x2.js predict 1`
--   To evaluate: `node tf/v1/use-high-bilstm-x2.js evaluate`
--   To train: `node tf/v1/use-high-bilstm-x2.js train`
--   To summary: `node tf/v1/use-high-bilstm-x2.js summary`
+- To predict: `node tf/v1/use-high-bilstm-x2.js predict 1`
+- To evaluate: `node tf/v1/use-high-bilstm-x2.js evaluate`
+- To train: `node tf/v1/use-high-bilstm-x2.js train`
+- To summary: `node tf/v1/use-high-bilstm-x2.js summary`
 
 ### Training & Evaluating Settings
 
@@ -237,15 +233,15 @@ yarn stop
 
 **APIs for dataset**
 
--   [data/get](http://api.smart.cas-ll.cn/data/get)
--   [data/intent](http://api.smart.cas-ll.cn/data/intent)
--   [data/vulnerability](http://api.smart.cas-ll.cn/data/vulnerability)
+- [data/get](http://api.smart.cas-ll.cn/data/get)
+- [data/intent](http://api.smart.cas-ll.cn/data/intent)
+- [data/vulnerability](http://api.smart.cas-ll.cn/data/vulnerability)
 
 **SmartBERT APIs**
 
--   [tokenize](http://api.smart.cas-ll.cn/smartbert/tokenize)
--   [embed](http://api.smart.cas-ll.cn/smartbert/embed)
--   [token/get](http://api.smart.cas-ll.cn/smartbert/tree)
+- [tokenize](http://api.smart.cas-ll.cn/smartbert/tokenize)
+- [embed](http://api.smart.cas-ll.cn/smartbert/embed)
+- [token/get](http://api.smart.cas-ll.cn/smartbert/tree)
 
 **POST params**
 
@@ -260,39 +256,6 @@ EXAMPLE: [embed](http://api.smart.cas-ll.cn/smartbert/embed) is used to convert 
     "pool": "avg"
 }
 ```
-
-## Paper
-
-```tex
-@article{huang2025smart,
-  title={Smart Contract Intent Detection with Pre-trained Programming Language Model},
-  author={Huang, Youwei and Li, Jianwen and Fang, Sen and Li, Yao and Yang, Peng and Hu, Bin},
-  journal={arXiv preprint arXiv:2508.20086},
-  year={2025}
-}
-```
-
-```tex
-@inproceedings{huang2025deep,
-  title={Deep smart contract intent detection},
-  author={Huang, Youwei and Fang, Sen and Li, Jianwen and Hu, Bin and Tao, Jiachun and Zhang, Tao},
-  booktitle={2025 IEEE International Conference on Software Analysis, Evolution and Reengineering (SANER)},
-  pages={124--135},
-  year={2025},
-  organization={IEEE}
-}
-```
-
-```tex
-@article{huang2022smartintentnn,
-  title={Smartintentnn: Towards smart contract intent detection},
-  author={Huang, Youwei and Fang, Sen and Li, Jianwen and Hu, Bin and Zhang, Tao},
-  journal={arXiv preprint arXiv:2211.13670},
-  year={2022}
-}
-```
-
-Continuously writing and updating...
 
 ## Resource
 
@@ -313,13 +276,3 @@ Continuously writing and updating...
 1. [TensorFlow.js](https://js.tensorflow.org/api/latest/)
 2. [TensorFlow Hub](https://tfhub.dev/)
 3. [Universal Sentence Encoder V4](https://tfhub.dev/google/universal-sentence-encoder/4)
-
-## Contributors
-
--   [Youwei Huang](https://www.devil.ren) – Project initiator, first author, and principal researcher
--   [Sen Fang](https://tomasandersonfang.github.io/) – Model development, paper review, and principal researcher (model)
-
-## Acknowledgment
-
--   [Institute of Intelligent Computing Technology, Suzhou, CAS](http://iict.ac.cn/)
--   [Macau University of Science and Technology](http://www.must.edu.mo)
