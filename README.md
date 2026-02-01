@@ -1,14 +1,14 @@
 # Web3 Software Engineering Toolkit
 
-🤩 We are building a comprehensive toolkit for **Software Engineering of Web3**.
+🤩 We are building a comprehensive toolkit for **Web3 Software Engineering**!
 
-To try our research tools online, please visit the following website:
-
-👉 <https://web3se-lab.github.io>
+**🚀 Website:** <https://web3se-lab.github.io>
+**🤗 Dataset:**: <https://huggingface.co/datasets/web3se/smart-contract-intent-vul-dataset>
+**🤗 Models:**: <https://huggingface.co/web3se/SmartBERT-v2>
 
 ## Toolkit
 
-**Tags: Web3, AI, Software Engineering**
+**Tags**: Web3, AI, Software Engineering
 
 - 🕸️ Web3 Data Crawler
 - 🤔 Web3 Data Collection, Labelling, and Analysis
@@ -26,10 +26,13 @@ To try our research tools online, please visit the following website:
 
 **Technical Points:**
 
-- Convert **smart contract** code context to vectors.
-- Built with **BERT/RoBERTa**-based pre-training models.
-- MLM-trained on **16,000+** (V2) real smart contracts.
-- Serving APIs: [tokenize](http://api.smart.cas-ll.cn/smartbert/tokenize), [embed](http://api.smart.cas-ll.cn/smartbert/embed), [code tree](http://api.smart.cas-ll.cn/smartbert/tree).
+- Built with **BERT-based** pre-training models.
+- Encode **smart contract** function-level code into embeddings.
+- MLM-trained on **16,000+** (V2) real-world smart contracts.
+- Serving APIs (POST):
+    - [embed](https://web3.devil.ren/smartbert/embed)
+    - [tokenize](https://web3.devil.ren/smartbert/tokenize)
+    - [code tree](https://web3.devil.ren/smartbert/tree).
 
 ### Project-2: SmartIntentNN
 
@@ -43,25 +46,27 @@ To try our research tools online, please visit the following website:
 
 **Technical Guide:**
 
-- ⚙️ Frontend repository: <https://github.com/web3se-lab/web3se-lab.github.io>
-- 📱 Pages for testing the model online: [Detect](https://web3se-lab.github.io), [Highlight](https://web3se-lab.github.io/highlight/), [Evaluate](https://web3se-lab.github.io/evaluate/)
 - 🕵️ Click **"Detect My Smart Contract"** to copy and detect your customized smart contract.
 - 🚀 Click **"Predict 🚀"** to detect the malicious intents in smart contracts.
 - 🌲 Click **"CCTree 🌲"** to view the smart contract code tree.
+- 📱 Pages for testing the model online:
+    - [Detect](https://web3se-lab.github.io)
+    - [Highlight](https://web3se-lab.github.io/highlight/)
+    - [Evaluate](https://web3se-lab.github.io/evaluate/)
+- ⚙️ Frontend repository: <https://github.com/web3se-lab/web3se-lab.github.io>
 
 **Technical Points:**
 
-- SmartIntentNN V1.0 is trained and evaluated on **Tensorflow.js**.
-- SmartIntentNN V1.0 employs a **Universal Sentence Encoder** to generate smart contract embeddings.
-- The intent highlight model is trained using **K-means clustering**.
-- SmartIntentNN V2.0 will integrate **SmartBERT** to embed smart contracts.
-- SmartIntentNN V2.0 is currently under writing. Stay tuned! (Maybe meet in ICSE2026).
+- **SmartIntentNN V1.0** is trained and evaluated on **Tensorflow.js**.
+- **SmartIntentNN V1.0** employs a **Universal Sentence Encoder** to generate smart contract embeddings.
+- The **intent highlight model** is trained using **K-means clustering**.
+- **SmartIntent V2** integrates **SmartBERT** to embed smart contracts.
 
 ## Dataset
 
 We have compiled a comprehensive dataset of **vulnerabilities** and **intents** in smart contracts!
 
-**💽 Access Our Dataset via this API: <https://api.smart.cas-ll.cn>**
+**💽 Access Our Dataset via this API: <https://web3.devil.ren>**
 
 The URL above offers a `GET/POST JSON` API.
 
@@ -71,7 +76,7 @@ Please refer to the guidelines below:
 
 ### Smart Contract Intent
 
-<https://api.smart.cas-ll.cn/data/intent?key=1>
+<https://web3.devil.ren/data/intent?key=1>
 
 Please iterate over keys: `1, 2, 3, ...`. If an error occurs, skip that key and continue (key++, continue).
 
@@ -92,7 +97,7 @@ Ground truth label distribution for Intent data:
 
 ### Smart Contract Vulnerability
 
-<https://api.smart.cas-ll.cn/data/vulnerability?key=1>
+<https://web3.devil.ren/data/vulnerability?key=1>
 
 Please iterate over keys: `1, 2, 3, ...`. If an error occurs, skip that key and continue (key++, continue).
 
@@ -156,14 +161,6 @@ yarn
 # or
 npm install
 ```
-
-## Prepare
-
-Prepare a csv dataset of smart contracts and put them in the directory `/db`.
-
-For BSC Mainnet, download the latest verified contracts from [BSC verified contracts addresses](https://bscscan.com/exportData?type=open-source-contract-codes).
-
-Then, you need to config your own _bscscan_, _etherscan_ [API](https://docs.bscscan.com/api-endpoints/contracts) secret keys in `/src/config/network.json`.
 
 ## Database
 
@@ -233,22 +230,22 @@ yarn stop
 
 **APIs for dataset**
 
-- [data/get](http://api.smart.cas-ll.cn/data/get)
-- [data/intent](http://api.smart.cas-ll.cn/data/intent)
-- [data/vulnerability](http://api.smart.cas-ll.cn/data/vulnerability)
+- [data/get](https://web3.devil.ren/data/get)
+- [data/intent](https://web3.devil.ren/data/intent)
+- [data/vulnerability](https://web3.devil.ren/data/vulnerability)
 
 **SmartBERT APIs**
 
-- [tokenize](http://api.smart.cas-ll.cn/smartbert/tokenize)
-- [embed](http://api.smart.cas-ll.cn/smartbert/embed)
-- [token/get](http://api.smart.cas-ll.cn/smartbert/tree)
+- [tokenize](https://web3.devil.ren/smartbert/tokenize)
+- [embed](https://web3.devil.ren/smartbert/embed)
+- [token/get](https://web3.devil.ren/smartbert/tree)
 
 **POST params**
 
 1. `code` smart contract code content (Solidity)
 2. `pool` pooling type: `avg`, `max`, `cls`
 
-EXAMPLE: [embed](http://api.smart.cas-ll.cn/smartbert/embed) is used to convert smart contract code to embedding vectors:
+EXAMPLE: [embed](https://web3.devil.ren/smartbert/embed) is used to convert smart contract code to embedding vectors:
 
 ```json
 {
